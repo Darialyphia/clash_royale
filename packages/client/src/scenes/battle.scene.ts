@@ -1,4 +1,12 @@
-import { Actor, Rectangle, Scene, TileMap, Vector } from 'excalibur';
+import {
+  Actor,
+  Engine,
+  PointerEvent,
+  Rectangle,
+  Scene,
+  TileMap,
+  Vector
+} from 'excalibur';
 import {
   DEBUG,
   HEIGHT,
@@ -13,6 +21,9 @@ import {
 import { mapSheet } from '../resources';
 import { Player } from '@/entities/player/player';
 import { GameSession } from '@/entities/game-session';
+import { GameCoords } from '@/utils/game-coords';
+import { pointRectCollision, rectRectCollision } from '@game/shared';
+import { UnitBlueprint } from '@/entities/unit/unit.entity';
 
 export type GameState = {
   players: Player[];
@@ -21,10 +32,43 @@ export type GameState = {
 export class BattleScene extends Scene {
   private session = new GameSession(SESSION_BLUEPRINT);
 
-  onInitialize(): void {
+  onInitialize(engine: Engine): void {
     this.setupCamera();
     this.setupMap();
     this.addActors();
+
+    engine.input.pointers.primary.on('up', this.handleClick.bind(this));
+  }
+
+  // temporary method to get the players we're controlling
+  get myPlayer() {
+    return this.session.teams[0].getPlayerById('player1')!;
+  }
+
+  private handleClick(e: PointerEvent) {
+    const gameCoords = GameCoords.fromScreenCoords(e.screenPos);
+    const isInDeployZone = pointRectCollision(
+      gameCoords.coords,
+      this.session.teams[0].deployZone
+    );
+    if (!isInDeployZone) return;
+
+    const blueprint: UnitBlueprint = {
+      attack: 5,
+      health: 30,
+      range: TILE_SIZE,
+      spawnTime: 1000,
+      speed: 10,
+      size: { width: 0.5, height: 0.5 }
+    };
+
+    const unit = this.myPlayer.deployUnit(
+      gameCoords.coords.x,
+      gameCoords.coords.y,
+      blueprint
+    );
+
+    this.add(unit);
   }
 
   private setupCamera() {
@@ -66,6 +110,7 @@ export class BattleScene extends Scene {
         actor.graphics.use(rect);
         this.add(actor);
       }
+
       team.players.forEach(player => {
         player.towers.forEach(tower => {
           this.add(tower);

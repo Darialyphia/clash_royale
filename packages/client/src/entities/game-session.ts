@@ -1,9 +1,9 @@
 import { StrictOmit } from '@game/shared';
-import { Team, TeamBluprint } from './team/team';
+import { Team, TeamBlueprint } from './team/team';
 import { nanoid } from 'nanoid';
 
 export type GameSessionBlueprint = {
-  teams: [StrictOmit<TeamBluprint, 'id'>, StrictOmit<TeamBluprint, 'id'>];
+  teams: [StrictOmit<TeamBlueprint, 'id'>, StrictOmit<TeamBlueprint, 'id'>];
   map: [number, number][];
 };
 

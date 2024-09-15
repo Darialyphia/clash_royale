@@ -1,14 +1,15 @@
 import { Point } from '@game/shared';
 import { GameSession } from '../game-session';
 import { Tower } from '../tower/tower';
-import { Unit } from '../unit/unit.entity';
+import { Unit, UnitBlueprint } from '../unit/unit.entity';
 import {
   INNER_TOWER_ATTACK,
   INNER_TOWER_HEALTH,
   INNER_TOWER_RANGE,
   OUTER_TOWER_ATTACK,
   OUTER_TOWER_HEALTH,
-  OUTER_TOWER_RANGE
+  OUTER_TOWER_RANGE,
+  TILE_SIZE
 } from '@/constants';
 import { GameCoords } from '@/utils/game-coords';
 import { Entity } from '../_entity';
@@ -24,9 +25,9 @@ export type PlayerBlueprint = {
 export class Player extends Entity {
   private session: GameSession;
 
-  readonly units: Unit[] = [];
+  readonly units: Set<Unit> = new Set();
 
-  readonly towers: Tower[] = [];
+  readonly towers: Set<Tower> = new Set();
 
   constructor(session: GameSession, blueprint: PlayerBlueprint) {
     super(blueprint.id);
@@ -55,7 +56,7 @@ export class Player extends Entity {
       },
       player: this
     });
-    this.towers.push(tower);
+    this.towers.add(tower);
 
     return tower;
   }
@@ -70,8 +71,19 @@ export class Player extends Entity {
       },
       player: this
     });
-    this.towers.push(tower);
+    this.towers.add(tower);
 
     return tower;
+  }
+
+  deployUnit(x: number, y: number, blueprint: UnitBlueprint) {
+    const unit = new Unit({
+      player: this,
+      position: { x, y },
+      blueprint
+    });
+    this.units.add(unit);
+
+    return unit;
   }
 }

@@ -4,8 +4,9 @@ import { UnitSpawningState } from './states/spawning-state';
 import { UnitMovingState } from './states/moving-state';
 import { UnitAttackingState } from './states/attacking-state';
 import StateMachineBuilder, { StateMachine } from '@/utils/state-machine';
-import { UNIT_HEIGHT, UNIT_WIDTH } from '@/constants';
 import { Player } from '../player/player';
+import { TILE_SIZE } from '@/constants';
+import { GameCoords } from '@/utils/game-coords';
 
 export type UnitBlueprint = {
   speed: number;
@@ -13,6 +14,7 @@ export type UnitBlueprint = {
   range: number;
   health: number;
   spawnTime: number;
+  size: { width: number; height: number };
 };
 
 const UNIT_STATES = {
@@ -44,11 +46,12 @@ export class Unit extends Actor {
     blueprint: UnitBlueprint;
     player: Player;
   }) {
+    const screenCoords = new GameCoords(position.x, position.y).toScreenCoords();
     super({
-      x: position.x,
-      y: position.y,
-      width: UNIT_WIDTH,
-      height: UNIT_HEIGHT,
+      x: screenCoords.x,
+      y: screenCoords.y,
+      width: blueprint.size.width * TILE_SIZE,
+      height: blueprint.size.height * TILE_SIZE,
       color: Color.Blue
     });
     this.player = player;
@@ -82,7 +85,7 @@ export class Unit extends Actor {
   }
 
   get enemyTowers() {
-    return this.player.opponents.map(enemy => enemy.towers).flat();
+    return [...this.player.opponents].map(enemy => enemy.towers).flat();
   }
 
   onPreUpdate(_engine: Engine, delta: number) {

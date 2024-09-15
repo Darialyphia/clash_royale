@@ -9,8 +9,6 @@ export const MAP_COLS = 11;
 export const WIDTH = TILE_SIZE * MAP_COLS;
 export const HEIGHT = TILE_SIZE * MAP_ROWS;
 
-export const UNIT_WIDTH = 0.5;
-export const UNIT_HEIGHT = 0.5;
 export const TOWER_WIDTH = 1;
 export const TOWER_HEIGHT = 1;
 
@@ -19,13 +17,13 @@ export const TEAM_1_DEPLOY_ZONE_COLOR = Color.fromHSL(
   mapRange(140, [0, 360], [0, 1]),
   0.7,
   0.6,
-  1
+  0.5
 );
 export const TEAM_2_DEPLOY_ZONE_COLOR = Color.fromHSL(
   mapRange(40, [0, 360], [0, 1]),
   0.7,
   0.6,
-  1
+  0.5
 );
 export const OUTER_TOWER_RANGE = TILE_SIZE * 3;
 export const OUTER_TOWER_HEALTH = 500;
