@@ -1,0 +1,13 @@
+export type EntityId = string;
+
+export abstract class Entity {
+  readonly id: string;
+
+  constructor(id: EntityId) {
+    this.id = id;
+  }
+
+  equals(e: Entity) {
+    return this.id == e.id;
+  }
+}
