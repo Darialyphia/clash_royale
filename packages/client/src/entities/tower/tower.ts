@@ -1,5 +1,5 @@
 import { DEBUG, TILE_SIZE, TOWER_HEIGHT, TOWER_WIDTH } from '@/constants';
-import StateMachineBuilder from '@/utils/state-machine';
+import StateMachineBuilder, { StateMachine } from '@/utils/state-machine';
 import { Values } from '@game/shared';
 import { Actor, Circle, Color, Engine, Rectangle, Vector } from 'excalibur';
 import { TowerIdleState } from './states/idle-state';
@@ -20,12 +20,12 @@ const TOWER_STATES = {
 export type TowerState = Values<typeof TOWER_STATES>;
 
 export class Tower extends Actor {
+  private stateMachine: StateMachine<Tower, TowerState>;
+
   private readonly blueprint: TowerBlueprint;
+
   readonly player: Player;
 
-  private stateMachine = new StateMachineBuilder<Tower>()
-    .add(TOWER_STATES.IDLE, new TowerIdleState())
-    .build(this, TOWER_STATES.IDLE);
   health: number;
 
   constructor({
@@ -49,6 +49,9 @@ export class Tower extends Actor {
     this.player = player;
     this.blueprint = blueprint;
     this.health = this.blueprint.health;
+    this.stateMachine = new StateMachineBuilder<Tower>()
+      .add(TOWER_STATES.IDLE, new TowerIdleState())
+      .build(this, TOWER_STATES.IDLE);
 
     this.addSprite();
     if (DEBUG) {
@@ -92,7 +95,7 @@ export class Tower extends Actor {
     const circle = new Circle({
       color,
       strokeColor: Color.Red,
-      radius: this.range / 2
+      radius: (this.range * TILE_SIZE) / 2
     });
 
     const actor = new Actor({

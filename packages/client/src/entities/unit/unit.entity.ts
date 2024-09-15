@@ -1,11 +1,11 @@
 import { Point, Values } from '@game/shared';
-import { Actor, Color, Engine } from 'excalibur';
+import { Actor, Circle, Color, Engine, Vector } from 'excalibur';
 import { UnitSpawningState } from './states/spawning-state';
 import { UnitMovingState } from './states/moving-state';
 import { UnitAttackingState } from './states/attacking-state';
 import StateMachineBuilder, { StateMachine } from '@/utils/state-machine';
 import { Player } from '../player/player';
-import { TILE_SIZE } from '@/constants';
+import { DEBUG, TILE_SIZE } from '@/constants';
 import { GameCoords } from '@/utils/game-coords';
 
 export type UnitBlueprint = {
@@ -26,13 +26,10 @@ const UNIT_STATES = {
 export type UnitState = Values<typeof UNIT_STATES>;
 
 export class Unit extends Actor {
-  private stateMachine = new StateMachineBuilder<Unit>()
-    .add(UNIT_STATES.SPAWNING, new UnitSpawningState())
-    .add(UNIT_STATES.MOVING, new UnitMovingState())
-    .add(UNIT_STATES.ATTACKING, new UnitAttackingState())
-    .build(this, UNIT_STATES.SPAWNING);
+  private stateMachine: StateMachine<Unit, UnitState>;
 
   private readonly blueprint: UnitBlueprint;
+
   private readonly player: Player;
 
   health: number;
@@ -47,13 +44,16 @@ export class Unit extends Actor {
     player: Player;
   }) {
     const screenCoords = new GameCoords(position.x, position.y).toScreenCoords();
+    console.log(position);
     super({
       x: screenCoords.x,
       y: screenCoords.y,
       width: blueprint.size.width * TILE_SIZE,
       height: blueprint.size.height * TILE_SIZE,
-      color: Color.Blue
+      color: Color.Blue,
+      anchor: new Vector(0, 0)
     });
+
     this.player = player;
     this.blueprint = blueprint;
     this.health = this.blueprint.health;
@@ -62,6 +62,10 @@ export class Unit extends Actor {
       .add(UNIT_STATES.MOVING, new UnitMovingState())
       .add(UNIT_STATES.ATTACKING, new UnitAttackingState())
       .build(this, UNIT_STATES.SPAWNING);
+
+    if (DEBUG) {
+      this.debug();
+    }
   }
 
   get speed() {
@@ -85,7 +89,7 @@ export class Unit extends Actor {
   }
 
   get enemyTowers() {
-    return [...this.player.opponents].map(enemy => enemy.towers).flat();
+    return [...this.player.opponents].map(enemy => [...enemy.towers]).flat();
   }
 
   onPreUpdate(_engine: Engine, delta: number) {
@@ -98,5 +102,27 @@ export class Unit extends Actor {
 
   startAttacking() {
     this.stateMachine.setState(UNIT_STATES.ATTACKING);
+  }
+
+  debugAttackRange() {
+    const color = Color.Red.clone();
+    color.a = 0.25;
+
+    const circle = new Circle({
+      color,
+      strokeColor: Color.Red,
+      radius: (this.range * TILE_SIZE) / 2
+    });
+
+    const actor = new Actor({
+      x: (this.blueprint.size.width * TILE_SIZE) / 2,
+      y: (this.blueprint.size.height * TILE_SIZE) / 2
+    });
+    actor.graphics.use(circle);
+    this.addChild(actor);
+  }
+
+  debug() {
+    this.debugAttackRange();
   }
 }

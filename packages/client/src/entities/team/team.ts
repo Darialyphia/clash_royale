@@ -23,7 +23,7 @@ export class Team extends Entity {
   constructor(session: GameSession, blueprint: TeamBlueprint) {
     super(blueprint.id);
     this.session = session;
-    this.players = new Set(blueprint.players.map(p => new Player(this.session, p)));
+    this.players = new Set(blueprint.players.map(p => new Player(this.session, p, this)));
     this.deployZone = blueprint.deployZone;
     this.players.forEach(player => this.playerMap.set(player.id, player));
   }

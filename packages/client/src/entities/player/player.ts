@@ -13,6 +13,7 @@ import {
 } from '@/constants';
 import { GameCoords } from '@/utils/game-coords';
 import { Entity } from '../_entity';
+import { Team } from '../team/team';
 
 export type PlayerId = string;
 
@@ -25,12 +26,15 @@ export type PlayerBlueprint = {
 export class Player extends Entity {
   private session: GameSession;
 
+  private team: Team;
+
   readonly units: Set<Unit> = new Set();
 
   readonly towers: Set<Tower> = new Set();
 
-  constructor(session: GameSession, blueprint: PlayerBlueprint) {
+  constructor(session: GameSession, blueprint: PlayerBlueprint, team: Team) {
     super(blueprint.id);
+    this.team = team;
     this.session = session;
     this.addInnerTower(blueprint.innerTower.x, blueprint.innerTower.y);
     blueprint.outerTowers.forEach(({ x, y }) => {
@@ -43,7 +47,7 @@ export class Player extends Entity {
   }
 
   get opponents() {
-    return this.session.teams.find(team => !team.equals(this))!.players;
+    return this.session.teams.find(team => !team.equals(this.team))!.players;
   }
 
   addInnerTower(x: number, y: number) {

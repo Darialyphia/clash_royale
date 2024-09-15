@@ -13,7 +13,7 @@ export class Vec2 implements Serializable {
     return Vec2.from(vec1).sub(vec2);
   }
 
-  static mul(vec1: Point, vec2: Point) {
+  static scale(vec1: Point, vec2: Point) {
     return Vec2.from(vec1).mul(vec2);
   }
 

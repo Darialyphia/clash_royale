@@ -5,8 +5,7 @@ export class GameCoords {
   coords: Vector;
 
   static fromScreenCoords(vec: Vector) {
-    const { x, y } = vec.scale(1 / (TILE_SIZE * 2));
-    return new GameCoords(x, y);
+    return new GameCoords(vec.x / TILE_SIZE, vec.y / TILE_SIZE);
   }
   constructor(x: number, y: number) {
     this.coords = new Vector(x, y);

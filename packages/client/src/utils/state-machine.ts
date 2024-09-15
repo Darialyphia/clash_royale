@@ -4,10 +4,7 @@ export type State<TContext> = {
   onExit?: (ctx: TContext) => void;
 };
 
-export default class StateMachineBuilder<
-  TContext,
-  TStates extends string[] = [],
-> {
+export default class StateMachineBuilder<TContext, TStates extends string[] = []> {
   private states = new Map<string, State<TContext>>();
 
   add<TName extends string>(
@@ -16,18 +13,11 @@ export default class StateMachineBuilder<
   ): StateMachineBuilder<TContext, [typeof name, ...TStates]> {
     this.states.set(name, state);
 
-    return this as unknown as StateMachineBuilder<
-      TContext,
-      [typeof name, ...TStates]
-    >;
+    return this as unknown as StateMachineBuilder<TContext, [typeof name, ...TStates]>;
   }
 
   build(ctx: TContext, initialState: TStates[number]) {
-    return new StateMachine<TContext, TStates[number]>(
-      this.states,
-      ctx,
-      initialState
-    );
+    return new StateMachine<TContext, TStates[number]>(this.states, ctx, initialState);
   }
 }
 
@@ -44,6 +34,7 @@ export class StateMachine<TContext, TStates extends string> {
     this.states = states;
     this.ctx = ctx;
     this.currentState = initialState;
+    this.getState(this.currentState).onEnter?.(this.ctx);
   }
 
   private getState(name: TStates) {

@@ -25,11 +25,11 @@ export const TEAM_2_DEPLOY_ZONE_COLOR = Color.fromHSL(
   0.6,
   0.5
 );
-export const OUTER_TOWER_RANGE = TILE_SIZE * 3;
+export const OUTER_TOWER_RANGE = 3;
 export const OUTER_TOWER_HEALTH = 500;
 export const OUTER_TOWER_ATTACK = 10;
 
-export const INNER_TOWER_RANGE = TILE_SIZE * 3;
+export const INNER_TOWER_RANGE = 3;
 export const INNER_TOWER_ATTACK = 15;
 export const INNER_TOWER_HEALTH = 800;
 

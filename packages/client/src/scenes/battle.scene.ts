@@ -22,7 +22,7 @@ import { mapSheet } from '../resources';
 import { Player } from '@/entities/player/player';
 import { GameSession } from '@/entities/game-session';
 import { GameCoords } from '@/utils/game-coords';
-import { pointRectCollision, rectRectCollision } from '@game/shared';
+import { pointRectCollision } from '@game/shared';
 import { UnitBlueprint } from '@/entities/unit/unit.entity';
 
 export type GameState = {
@@ -32,7 +32,7 @@ export type GameState = {
 export class BattleScene extends Scene {
   private session = new GameSession(SESSION_BLUEPRINT);
 
-  onInitialize(engine: Engine): void {
+  override onInitialize(engine: Engine): void {
     this.setupCamera();
     this.setupMap();
     this.addActors();
@@ -46,7 +46,7 @@ export class BattleScene extends Scene {
   }
 
   private handleClick(e: PointerEvent) {
-    const gameCoords = GameCoords.fromScreenCoords(e.screenPos);
+    const gameCoords = GameCoords.fromScreenCoords(e.worldPos);
     const isInDeployZone = pointRectCollision(
       gameCoords.coords,
       this.session.teams[0].deployZone
@@ -56,9 +56,9 @@ export class BattleScene extends Scene {
     const blueprint: UnitBlueprint = {
       attack: 5,
       health: 30,
-      range: TILE_SIZE,
+      range: 1,
       spawnTime: 1000,
-      speed: 10,
+      speed: 1,
       size: { width: 0.5, height: 0.5 }
     };
 
