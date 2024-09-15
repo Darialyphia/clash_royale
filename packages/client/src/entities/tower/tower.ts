@@ -1,15 +1,7 @@
-import { TILE_SIZE, TOWER_HEIGHT, TOWER_WIDTH } from '@/constants';
+import { DEBUG, TILE_SIZE, TOWER_HEIGHT, TOWER_WIDTH } from '@/constants';
 import StateMachineBuilder from '@/utils/state-machine';
 import { Values } from '@game/shared';
-import {
-  Actor,
-  Circle,
-  Color,
-  Engine,
-  GraphicsGroup,
-  Rectangle,
-  Vector
-} from 'excalibur';
+import { Actor, Circle, Color, Engine, Rectangle, Vector } from 'excalibur';
 import { TowerIdleState } from './states/idle-state';
 import { GameCoords } from '@/utils/game-coords';
 import { resources } from '@/resources';
@@ -49,8 +41,8 @@ export class Tower extends Actor {
     super({
       x,
       y,
-      width: TOWER_WIDTH,
-      height: TOWER_HEIGHT,
+      width: TOWER_WIDTH * TILE_SIZE,
+      height: TOWER_HEIGHT * TILE_SIZE,
       color: Color.DarkGray,
       anchor: new Vector(0, 0)
     });
@@ -59,7 +51,9 @@ export class Tower extends Actor {
     this.health = this.blueprint.health;
 
     this.addSprite();
-    this.debug();
+    if (DEBUG) {
+      this.debug();
+    }
   }
 
   addSprite() {
@@ -100,14 +94,17 @@ export class Tower extends Actor {
       radius: this.range / 2
     });
 
-    const actor = new Actor({ x: TOWER_WIDTH / 2, y: TOWER_HEIGHT / 2 });
+    const actor = new Actor({
+      x: (TOWER_WIDTH * TILE_SIZE) / 2,
+      y: (TOWER_HEIGHT * TILE_SIZE) / 2
+    });
     actor.graphics.use(circle);
     this.addChild(actor);
   }
 
   debugHitbox() {
     const color = Color.Blue.clone();
-    color.a = 0.75;
+    color.a = 0.5;
 
     const rect = new Rectangle({
       height: TILE_SIZE,

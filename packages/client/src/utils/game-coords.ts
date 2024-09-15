@@ -8,7 +8,6 @@ export class GameCoords {
   }
 
   toScreenCoords() {
-    console.log(this.coords);
     return this.coords.scale(TILE_SIZE);
   }
 }

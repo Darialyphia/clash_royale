@@ -2,16 +2,17 @@ import { mapRange } from '@game/shared';
 import { Color } from 'excalibur';
 import { GameSessionBlueprint } from './entities/game-session';
 
+export const DEBUG = true;
 export const TILE_SIZE = 32;
 export const MAP_ROWS = 7;
 export const MAP_COLS = 11;
 export const WIDTH = TILE_SIZE * MAP_COLS;
 export const HEIGHT = TILE_SIZE * MAP_ROWS;
 
-export const UNIT_WIDTH = TILE_SIZE / 2;
-export const UNIT_HEIGHT = TILE_SIZE / 2;
-export const TOWER_WIDTH = TILE_SIZE;
-export const TOWER_HEIGHT = TILE_SIZE;
+export const UNIT_WIDTH = 0.5;
+export const UNIT_HEIGHT = 0.5;
+export const TOWER_WIDTH = 1;
+export const TOWER_HEIGHT = 1;
 
 export const BG_COLOR = Color.fromHSL(mapRange(250, [0, 360], [0, 1]), 0.3, 0.25);
 
@@ -23,20 +24,28 @@ export const INNER_TOWER_RANGE = TILE_SIZE * 3;
 export const INNER_TOWER_ATTACK = 15;
 export const INNER_TOWER_HEALTH = 800;
 
-const GRASS: [number, number] = [0, 0];
-const WATER: [number, number] = [1, 0];
-const BRIDGE: [number, number] = [2, 0];
+type AtlasCoord = [number, number];
+const GRASS: AtlasCoord = [0, 0];
+const WATER: AtlasCoord = [1, 0];
+const BRIDGE: AtlasCoord = [2, 0];
+const BRIDGE_B: AtlasCoord = [3, 0];
+const PATH_H: AtlasCoord = [0, 1];
+const PATH_V: AtlasCoord = [1, 1];
+const PATH_CORNER_TL: AtlasCoord = [2, 1];
+const PATH_CORNER_TR: AtlasCoord = [3, 1];
+const PATH_CORNER_BL: AtlasCoord = [0, 2];
+const PATH_CORNER_BR: AtlasCoord = [1, 2];
 
 export const SESSION_BLUEPRINT: GameSessionBlueprint = {
   // prettier-ignore
   map: [
-    GRASS, GRASS, GRASS, GRASS, GRASS, WATER, GRASS, GRASS, GRASS, GRASS, GRASS, 
-    GRASS, GRASS, GRASS, GRASS, GRASS, BRIDGE,GRASS, GRASS, GRASS, GRASS, GRASS,
-    GRASS, GRASS, GRASS, GRASS, GRASS, WATER, GRASS, GRASS, GRASS, GRASS, GRASS, 
-    GRASS, GRASS, GRASS, GRASS, GRASS, WATER, GRASS, GRASS, GRASS, GRASS, GRASS, 
-    GRASS, GRASS, GRASS, GRASS, GRASS, WATER, GRASS, GRASS, GRASS, GRASS, GRASS,
-    GRASS, GRASS, GRASS, GRASS, GRASS, BRIDGE,GRASS, GRASS, GRASS, GRASS, GRASS, 
-    GRASS, GRASS, GRASS, GRASS, GRASS, WATER, GRASS, GRASS, GRASS, GRASS, GRASS,
+    GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
+    PATH_CORNER_TL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_TR,
+    PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
+    GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
+    PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
+    PATH_CORNER_BL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_BR,
+    GRASS,          GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, GRASS,
   ],
   teams: [
     {
