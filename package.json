@@ -1,0 +1,25 @@
+{
+  "name": "darialyst",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --concurrency=12",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "@game/tsconfig": "*",
+    "eslint": "^8.48.0",
+    "prettier": "^3.0.3",
+    "turbo": "1.12.5"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "configs/*"
+    ]
+  },
+  "dependencies": {
+    "@excaliburjs/plugin-pathfinding": "^0.29.1"
+  }
+}
