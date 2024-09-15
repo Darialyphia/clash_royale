@@ -15,7 +15,18 @@ export const TOWER_WIDTH = 1;
 export const TOWER_HEIGHT = 1;
 
 export const BG_COLOR = Color.fromHSL(mapRange(250, [0, 360], [0, 1]), 0.3, 0.25);
-
+export const TEAM_1_DEPLOY_ZONE_COLOR = Color.fromHSL(
+  mapRange(140, [0, 360], [0, 1]),
+  0.7,
+  0.6,
+  1
+);
+export const TEAM_2_DEPLOY_ZONE_COLOR = Color.fromHSL(
+  mapRange(40, [0, 360], [0, 1]),
+  0.7,
+  0.6,
+  1
+);
 export const OUTER_TOWER_RANGE = TILE_SIZE * 3;
 export const OUTER_TOWER_HEALTH = 500;
 export const OUTER_TOWER_ATTACK = 10;

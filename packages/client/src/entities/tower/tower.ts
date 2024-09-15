@@ -87,10 +87,11 @@ export class Tower extends Actor {
 
   debugAttackRange() {
     const color = Color.Red.clone();
-    color.a = 0.3;
+    color.a = 0.25;
 
     const circle = new Circle({
       color,
+      strokeColor: Color.Red,
       radius: this.range / 2
     });
 
@@ -104,12 +105,13 @@ export class Tower extends Actor {
 
   debugHitbox() {
     const color = Color.Blue.clone();
-    color.a = 0.5;
+    color.a = 0.25;
 
     const rect = new Rectangle({
       height: TILE_SIZE,
       width: TILE_SIZE,
-      color
+      color,
+      strokeColor: Color.Blue
     });
 
     const actor = new Actor({ x: 0, y: 0, anchor: new Vector(0, 0) });
