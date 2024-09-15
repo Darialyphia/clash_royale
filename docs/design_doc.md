@@ -1,5 +1,10 @@
 # Design Document
 
+## About this Document
+This document is not a binding specification and represents more a initial draft idea for the project.
+
+It is inteded to be treated as a living document.
+
 ## Inspiration
 - [Clash Royale](https://clashroyale.fandom.com/wiki/Basics_of_Battle)
 - [Minion Masters](https://minionmasters.fandom.com/wiki/Minion_Masters)
@@ -14,7 +19,7 @@
 
 - Two players play against each other and try to destroy the opponent's towers
 - Each player has 2 outer towers and one inner tower
-- A player wins if they destroy the inenr tower, even if all outer towers aren't destroyed
+- A player wins if they destroy the inner tower, even if all outer towers aren't destroyed
 - An inner tower can only be attacked once at elast one outer tower has been destroyed
 - To achieve this, players use a deck of cards that allows them to summon units or cast spells
 - To play cards, player need to have enough mana. Mana increases flatly over time up to a point.
