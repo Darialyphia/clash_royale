@@ -54,7 +54,7 @@ export class GameSession implements Serializable {
 
   private update() {
     const now = Date.now();
-    const delta = now - this.lastTickTimestamp;
+    const delta = Math.max(0, now - this.lastTickTimestamp);
     console.log('TODO: process inputs and update entities / systems');
     this.lastTickTimestamp = now;
   }
