@@ -19,7 +19,7 @@ import {
   WIDTH
 } from '../constants';
 import { mapSheet } from '../resources';
-import { Player } from '@/entities/player/player';
+import { Player, PlayerActor } from '@/entities/player/player';
 import { GameSession } from '@/entities/game-session';
 import { GameCoords } from '@/utils/game-coords';
 import { pointRectCollision } from '@game/shared';
@@ -93,6 +93,10 @@ export class BattleScene extends Scene {
     this.add(tilemap);
   }
 
+  onPreUpdate(engine: Engine, delta: number) {
+    super.onPreUpdate(engine, delta);
+  }
+
   addActors() {
     this.session.teams.forEach((team, index) => {
       if (DEBUG) {
@@ -110,6 +114,11 @@ export class BattleScene extends Scene {
         actor.graphics.use(rect);
         this.add(actor);
       }
+
+      this.add(new PlayerActor({
+        player: team.players.values().next().value!,
+        location: ["left", "right"][index] as "left" | "right"
+      }))
 
       team.players.forEach(player => {
         player.towers.forEach(tower => {

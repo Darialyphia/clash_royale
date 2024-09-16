@@ -9,11 +9,12 @@ import {
   OUTER_TOWER_ATTACK,
   OUTER_TOWER_HEALTH,
   OUTER_TOWER_RANGE,
-  TILE_SIZE
 } from '@/constants';
 import { GameCoords } from '@/utils/game-coords';
 import { Entity } from '../_entity';
 import { Team } from '../team/team';
+import { ManaSystem, ManaSystemActor, ManaSystemBlueprint } from '@/entities/mana/mana-system.ts';
+import { Actor, Engine } from 'excalibur';
 
 export type PlayerId = string;
 
@@ -21,7 +22,27 @@ export type PlayerBlueprint = {
   id: PlayerId;
   innerTower: Point;
   outerTowers: Point[];
+  manaSystem: ManaSystemBlueprint;
 };
+
+export class PlayerActor extends Actor {
+  public readonly player: Player;
+
+  constructor(blueprint: { player: Player, location: "left" | "right" }) {
+    super({
+      x: 0,
+      y: 0,
+      visible: false,
+    })
+    this.player = blueprint.player;
+    this.addChild(new ManaSystemActor({mana: this.player.manaSystem, location: blueprint.location}))
+  }
+
+  onPreUpdate(engine: Engine, delta: number) {
+    this.player.tick(delta)
+    super.onPreUpdate(engine, delta);
+  }
+}
 
 export class Player extends Entity {
   private session: GameSession;
@@ -32,6 +53,8 @@ export class Player extends Entity {
 
   readonly towers: Set<Tower> = new Set();
 
+  readonly manaSystem: ManaSystem;
+
   constructor(session: GameSession, blueprint: PlayerBlueprint, team: Team) {
     super(blueprint.id);
     this.team = team;
@@ -40,6 +63,11 @@ export class Player extends Entity {
     blueprint.outerTowers.forEach(({ x, y }) => {
       this.addOuterTower(x, y);
     });
+    this.manaSystem = new ManaSystem(blueprint.manaSystem);
+  }
+
+  tick(delta: number) {
+    this.manaSystem.tick(delta);
   }
 
   equals(player: Player) {

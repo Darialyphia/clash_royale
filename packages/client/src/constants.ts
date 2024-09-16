@@ -66,7 +66,13 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
           outerTowers: [
             { x: 1, y: 1 },
             { x: 1, y: MAP_ROWS - 2 }
-          ]
+          ],
+          manaSystem: {
+            initialValue: 0,
+            baseRechargeRate: 0.001,
+            maxCapacity: 5,
+            id: "mana1"
+          }
         }
       ]
     },
@@ -79,7 +85,13 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
           outerTowers: [
             { x: MAP_COLS - 2, y: 1 },
             { x: MAP_COLS - 2, y: MAP_ROWS - 2 }
-          ]
+          ],
+          manaSystem: {
+            initialValue: 0,
+            baseRechargeRate: 0.001,
+            maxCapacity: 10,
+            id: "mana2"
+          }
         }
       ]
     }
