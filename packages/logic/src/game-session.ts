@@ -1,11 +1,11 @@
 import type { Serializable, StrictOmit } from '@game/shared';
-import { Team, type TeamBlueprint } from './team/team';
+import { Team, type SerializedTeam, type TeamBlueprint } from './team/team';
 import { nanoid } from 'nanoid';
 import { config } from './config';
 import { TypedEventEmitter } from './utils/typed-emitter';
 
 export type SerializedGameSession = {
-  foo: boolean;
+  teams: [SerializedTeam, SerializedTeam];
 };
 
 export type GameSessionBlueprint = {
@@ -23,7 +23,7 @@ export type GameSessionEvents = {
 
 export type GameSessionSubscriber = (session: SerializedGameSession) => void;
 
-export class GameSession implements Serializable {
+export class GameSession implements Serializable<SerializedGameSession> {
   teams: [Team, Team];
 
   map: Array<[number, number]>;
@@ -60,7 +60,9 @@ export class GameSession implements Serializable {
   }
 
   serialize(): SerializedGameSession {
-    return { foo: true };
+    return {
+      teams: [this.teams[0].serialize(), this.teams[1].serialize()]
+    };
   }
 
   start() {

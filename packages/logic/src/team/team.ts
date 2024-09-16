@@ -1,16 +1,24 @@
 import { type Rectangle, type Serializable } from '@game/shared';
-import { Player, type PlayerBlueprint } from '../player/player';
+import { Player, type PlayerBlueprint, type SerializedPlayer } from '../player/player';
 import { GameSession } from '../game-session';
 import { Tower } from '../tower/tower';
 import { Entity, type EntityId } from '../entity';
 
+/**
+ * The shape of the input used to create a team
+ */
 export type TeamBlueprint = {
   id: EntityId;
   deployZone: Rectangle;
   players: PlayerBlueprint[];
 };
 
-export class Team extends Entity implements Serializable {
+export type SerializedTeam = {
+  players: SerializedPlayer[];
+  deployZone: Rectangle;
+};
+
+export class Team extends Entity implements Serializable<SerializedTeam> {
   private readonly session: GameSession;
 
   readonly players: Set<Player>;
@@ -52,6 +60,9 @@ export class Team extends Entity implements Serializable {
   // }
 
   serialize() {
-    return {};
+    return {
+      deployZone: this.deployZone,
+      players: [...this.players].map(player => player.serialize())
+    };
   }
 }

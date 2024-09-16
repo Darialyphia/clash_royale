@@ -17,7 +17,7 @@ export type TowerBlueprint = {
 };
 
 /**
- * The JSON serializable representation of a tower that is sent to the gamee session subscrbers
+ * The JSON serializable representation of a tower that is sent to the game session subscrbers
  */
 export type SerializedTower = {
   pos: Point;

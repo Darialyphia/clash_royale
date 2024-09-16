@@ -1,6 +1,6 @@
 import { type Point, type Serializable, Vec2 } from '@game/shared';
 import { GameSession } from '../game-session';
-import { Tower } from '../tower/tower';
+import { Tower, type SerializedTower } from '../tower/tower';
 import { Team } from '../team/team';
 import { Entity } from '../entity';
 import { config } from '../config';
@@ -8,6 +8,9 @@ import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system';
 
 export type PlayerId = string;
 
+/**
+ * The shape of the input used to create a player
+ */
 export type PlayerBlueprint = {
   id: PlayerId;
   innerTower: Point;
@@ -15,7 +18,16 @@ export type PlayerBlueprint = {
   manaSystem: ManaSystemBlueprint;
 };
 
-export class Player extends Entity implements Serializable {
+/**
+ * The JSON serializable representation of a player that is sent to the game session subscrbers
+ */
+export type SerializedPlayer = {
+  currentMana: number;
+  maxMana: number;
+  towers: SerializedTower[];
+};
+
+export class Player extends Entity implements Serializable<SerializedPlayer> {
   private session: GameSession;
 
   private team: Team;
@@ -93,6 +105,10 @@ export class Player extends Entity implements Serializable {
   // }
 
   serialize() {
-    return {};
+    return {
+      currentMana: this.manaSystem.current(),
+      maxMana: this.manaSystem.capacity(),
+      towers: [...this.towers].map(tower => tower.serialize())
+    };
   }
 }
