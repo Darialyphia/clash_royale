@@ -20,9 +20,12 @@ export type TowerBlueprint = {
  * The JSON serializable representation of a tower that is sent to the game session subscrbers
  */
 export type SerializedTower = {
+  id: string;
   pos: Point;
   maxHealth: number;
   health: number;
+  playerId: string;
+  attackRange: number;
 };
 
 const TOWER_STATES = {
@@ -106,9 +109,12 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
 
   serialize() {
     return {
+      id: this.id,
+      playerId: this.player.id,
       pos: this.pos,
       health: this.health,
-      maxHealth: this.maxHealth()
+      maxHealth: this.maxHealth(),
+      attackRange: this.attackRange()
     };
   }
 }

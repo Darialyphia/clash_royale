@@ -11,6 +11,7 @@
   "dependencies": {
     "@excaliburjs/plugin-aseprite": "^0.29.1",
     "@game/shared": "*",
+    "@game/logic": "*",
     "excalibur": "^0.29.3",
     "nanoid": "^5.0.7",
     "ts-pattern": "^5.3.1"

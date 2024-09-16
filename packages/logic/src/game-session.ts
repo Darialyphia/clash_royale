@@ -1,16 +1,27 @@
-import type { Serializable, StrictOmit } from '@game/shared';
+import type { StrictOmit } from '@game/shared';
 import { Team, type SerializedTeam, type TeamBlueprint } from './team/team';
 import { nanoid } from 'nanoid';
 import { config } from './config';
 import { TypedEventEmitter } from './utils/typed-emitter';
+import { Board, type BoardBlueprint, type SerializedBoard } from './board/board';
+import type { SerializedTower } from './tower/tower';
 
-export type SerializedGameSession = {
+export type SerializedGameStateSnapshot = {
+  state: {
+    teams: [StrictOmit<SerializedTeam, 'towers'>, StrictOmit<SerializedTeam, 'towers'>];
+    towers: SerializedTower[];
+  };
+  events: any[]; // @TODO: define how we represent events that happened during a tick so that the client can triggers things like sounds, VFX...
+};
+
+export type SerializedInitialState = {
   teams: [SerializedTeam, SerializedTeam];
+  board: SerializedBoard;
 };
 
 export type GameSessionBlueprint = {
   teams: [StrictOmit<TeamBlueprint, 'id'>, StrictOmit<TeamBlueprint, 'id'>];
-  map: [number, number][];
+  board: StrictOmit<BoardBlueprint, 'id'>;
 };
 
 const GAME_SESSION_EVENTS = {
@@ -18,15 +29,15 @@ const GAME_SESSION_EVENTS = {
 } as const;
 
 export type GameSessionEvents = {
-  [GAME_SESSION_EVENTS.UPDATE]: [SerializedGameSession];
+  [GAME_SESSION_EVENTS.UPDATE]: [SerializedGameStateSnapshot];
 };
 
-export type GameSessionSubscriber = (session: SerializedGameSession) => void;
+export type GameSessionSubscriber = (session: SerializedGameStateSnapshot) => void;
 
-export class GameSession implements Serializable<SerializedGameSession> {
+export class GameSession {
   teams: [Team, Team];
 
-  map: Array<[number, number]>;
+  board: Board;
 
   private emitter = new TypedEventEmitter<GameSessionEvents>();
 
@@ -37,7 +48,7 @@ export class GameSession implements Serializable<SerializedGameSession> {
   private lastTickTimestamp = 0;
 
   constructor(options: GameSessionBlueprint) {
-    this.map = options.map;
+    this.board = new Board(this, { ...options.board, id: nanoid(6) });
     this.teams = options.teams.map(team => {
       return new Team(this, {
         id: nanoid(6),
@@ -48,20 +59,43 @@ export class GameSession implements Serializable<SerializedGameSession> {
   }
 
   private tick() {
+    this.processInputs();
     this.update();
-    this.emitter.emit(GAME_SESSION_EVENTS.UPDATE, this.serialize());
+    this.emitter.emit(GAME_SESSION_EVENTS.UPDATE, this.serializeGameState());
+  }
+
+  private processInputs() {
+    return;
   }
 
   private update() {
     const now = performance.now();
     const delta = Math.max(0, now - this.lastTickTimestamp);
-    console.log('TODO: process inputs and update entities / systems');
+
+    this.teams.forEach(team => {
+      team.update(delta);
+    });
+
     this.lastTickTimestamp = now;
   }
 
-  serialize(): SerializedGameSession {
+  private serializeGameState(): SerializedGameStateSnapshot {
+    const { towers: team1Towers, ...team1 } = this.teams[0].serialize();
+    const { towers: team2Towers, ...team2 } = this.teams[1].serialize();
+
     return {
-      teams: [this.teams[0].serialize(), this.teams[1].serialize()]
+      state: {
+        teams: [team1, team2],
+        towers: [...team1Towers, ...team2Towers]
+      },
+      events: []
+    };
+  }
+
+  getInitialState(): SerializedInitialState {
+    return {
+      teams: [this.teams[0].serialize(), this.teams[1].serialize()],
+      board: this.board.serialize()
     };
   }
 

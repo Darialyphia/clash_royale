@@ -1,74 +1,38 @@
-import {
-  Actor,
-  Engine,
-  PointerEvent,
-  Rectangle,
-  Scene,
-  TileMap,
-  Vector
-} from 'excalibur';
-import {
-  DEBUG,
-  HEIGHT,
-  MAP_COLS,
-  MAP_ROWS,
-  SESSION_BLUEPRINT,
-  TEAM_1_DEPLOY_ZONE_COLOR,
-  TEAM_2_DEPLOY_ZONE_COLOR,
-  TILE_SIZE,
-  WIDTH
-} from '../constants';
+import { Engine, Scene, TileMap, Vector } from 'excalibur';
+import { HEIGHT, MAP_COLS, MAP_ROWS, SESSION_BLUEPRINT, WIDTH } from '../constants';
 import { mapSheet } from '../resources';
-import { Player, PlayerActor } from '@/entities/player/player';
-import { GameSession } from '@/entities/game-session';
-import { GameCoords } from '@/utils/game-coords';
-import { pointRectCollision } from '@game/shared';
-import { UnitBlueprint } from '@/entities/unit/unit.entity';
-
-export type GameState = {
-  players: Player[];
-};
+import { PlayerActor } from '@/actors/player/player';
+import {
+  GameSession,
+  SerializedBoard,
+  SerializedGameStateSnapshot,
+  SerializedTeam,
+  SerializedTower
+} from '@game/logic';
+import { TowerActor } from '@/actors/tower/tower';
 
 export class BattleScene extends Scene {
-  private session = new GameSession(SESSION_BLUEPRINT);
+  private gameState!: SerializedGameStateSnapshot['state'];
 
-  override onInitialize(engine: Engine): void {
+  private towerActorsMap = new Map<string, TowerActor>();
+
+  private playerActorsMap = new Map<string, PlayerActor>();
+
+  override onInitialize(): void {
+    const session = new GameSession(SESSION_BLUEPRINT);
     this.setupCamera();
-    this.setupMap();
-    this.addActors();
+    this.setupMap(session.getInitialState().board);
+    session.subscribe(({ state }) => {
+      this.gameState = state;
+      this.updateActors();
+    });
 
-    engine.input.pointers.primary.on('up', this.handleClick.bind(this));
+    session.start();
   }
 
   // temporary method to get the players we're controlling
   get myPlayer() {
-    return this.session.teams[0].getPlayerById('player1')!;
-  }
-
-  private handleClick(e: PointerEvent) {
-    const gameCoords = GameCoords.fromScreenCoords(e.worldPos);
-    const isInDeployZone = pointRectCollision(
-      gameCoords.coords,
-      this.session.teams[0].deployZone
-    );
-    if (!isInDeployZone) return;
-
-    const blueprint: UnitBlueprint = {
-      attack: 5,
-      health: 30,
-      range: 1,
-      spawnTime: 1000,
-      speed: 1,
-      size: { width: 0.5, height: 0.5 }
-    };
-
-    const unit = this.myPlayer.deployUnit(
-      gameCoords.coords.x,
-      gameCoords.coords.y,
-      blueprint
-    );
-
-    this.add(unit);
+    return this.gameState.teams[0].players.find(p => p.id === 'player1')!;
   }
 
   private setupCamera() {
@@ -76,7 +40,7 @@ export class BattleScene extends Scene {
     this.camera.move(new Vector(WIDTH / 2, HEIGHT / 2), 0);
   }
 
-  private setupMap() {
+  private setupMap(board: SerializedBoard) {
     const tilemap = new TileMap({
       rows: MAP_ROWS,
       columns: MAP_COLS,
@@ -85,7 +49,9 @@ export class BattleScene extends Scene {
     });
 
     tilemap.tiles.forEach((tile, index) => {
-      const [x, y] = this.session.map[index];
+      const {
+        atlasCoords: [x, y]
+      } = board.cells[index];
       const sprite = mapSheet.getSprite(x, y);
       tile.addGraphic(sprite);
     });
@@ -97,34 +63,60 @@ export class BattleScene extends Scene {
     super.onPreUpdate(engine, delta);
   }
 
-  addActors() {
-    this.session.teams.forEach((team, index) => {
-      if (DEBUG) {
-        const rect = new Rectangle({
-          width: team.deployZone.width * TILE_SIZE,
-          height: team.deployZone.height * TILE_SIZE,
-          color: index === 0 ? TEAM_1_DEPLOY_ZONE_COLOR : TEAM_2_DEPLOY_ZONE_COLOR
-        });
+  private createOrUpdateTower(tower: SerializedTower) {
+    if (!this.towerActorsMap.has(tower.id)) {
+      const newTower = new TowerActor(tower);
+      this.towerActorsMap.set(tower.id, newTower);
+      this.add(newTower);
+      return;
+    }
 
-        const actor = new Actor({
-          x: team.deployZone.x * TILE_SIZE,
-          y: team.deployZone.y * TILE_SIZE,
-          anchor: new Vector(0, 0)
-        });
-        actor.graphics.use(rect);
-        this.add(actor);
-      }
+    this.towerActorsMap.get(tower.id)!.onStateUpdate(tower);
+  }
 
-      this.add(new PlayerActor({
-        player: team.players.values().next().value!,
-        location: ["left", "right"][index] as "left" | "right"
-      }))
-
-      team.players.forEach(player => {
-        player.towers.forEach(tower => {
-          this.add(tower);
-        });
+  private createOrUpdatePlayer(
+    player: SerializedTeam['players'][number],
+    teamIndex: number
+  ) {
+    if (!this.playerActorsMap.has(player.id)) {
+      const newPlayer = new PlayerActor({
+        player,
+        location: ['left', 'right'][teamIndex] as 'left' | 'right'
       });
+      this.playerActorsMap.set(player.id, newPlayer);
+      this.add(newPlayer);
+      return;
+    }
+
+    this.playerActorsMap.get(player.id)!.onStateUpdate(player);
+  }
+
+  private updateActors() {
+    this.updateTowers();
+    this.updateTeams();
+  }
+
+  private updateTowers() {
+    // add or create tower actors
+    const towerIds = new Set<string>();
+    this.gameState.towers.forEach(tower => {
+      this.createOrUpdateTower(tower);
+      towerIds.add(tower.id);
+    });
+
+    // delete towers that are not here anymore
+    // later on we can handle this more gracefully, like playing a dying animations etc
+    for (const [towerId, tower] of this.towerActorsMap.entries()) {
+      if (!towerIds.has(towerId)) {
+        tower.kill();
+        this.towerActorsMap.delete(towerId);
+      }
+    }
+  }
+
+  private updateTeams() {
+    this.gameState.teams.forEach((team, index) => {
+      this.createOrUpdatePlayer(team.players.values().next().value!, index);
     });
   }
 }

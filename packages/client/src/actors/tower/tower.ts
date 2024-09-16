@@ -1,43 +1,20 @@
 import { DEBUG, TILE_SIZE, TOWER_HEIGHT, TOWER_WIDTH } from '@/constants';
-import StateMachineBuilder, { StateMachine } from '@/utils/state-machine';
-import { Values } from '@game/shared';
-import { Actor, Circle, Color, Engine, Rectangle, Vector } from 'excalibur';
-import { TowerIdleState } from './states/idle-state';
-import { GameCoords } from '@/utils/game-coords';
+import { Actor, Circle, Color, Rectangle, Vector } from 'excalibur';
+import { GameCoords, toScreen } from '@/utils/game-coords';
 import { resources } from '@/resources';
-import { Player } from '../player/player';
 
-export type TowerBlueprint = {
-  attack: number;
-  range: number;
-  health: number;
-};
+import { SerializedTower } from '@game/logic';
 
-const TOWER_STATES = {
-  IDLE: 'idle'
-} as const;
+export class TowerActor extends Actor {
+  attackRange: number;
 
-export type TowerState = Values<typeof TOWER_STATES>;
-
-export class Tower extends Actor {
-  private stateMachine: StateMachine<Tower, TowerState>;
-
-  private readonly blueprint: TowerBlueprint;
-
-  readonly player: Player;
+  maxHealth: number;
 
   health: number;
 
-  constructor({
-    position,
-    blueprint,
-    player
-  }: {
-    position: GameCoords;
-    blueprint: TowerBlueprint;
-    player: Player;
-  }) {
-    const { x, y } = position.toScreenCoords();
+  constructor(blueprint: SerializedTower) {
+    const { x, y } = new GameCoords(blueprint.pos.x, blueprint.pos.y).toScreenCoords();
+
     super({
       x,
       y,
@@ -46,17 +23,23 @@ export class Tower extends Actor {
       color: Color.DarkGray,
       anchor: new Vector(0, 0)
     });
-    this.player = player;
-    this.blueprint = blueprint;
-    this.health = this.blueprint.health;
-    this.stateMachine = new StateMachineBuilder<Tower>()
-      .add(TOWER_STATES.IDLE, new TowerIdleState())
-      .build(this, TOWER_STATES.IDLE);
+
+    this.attackRange = toScreen(blueprint.attackRange);
+
+    this.maxHealth = blueprint.maxHealth;
+
+    this.health = blueprint.health;
 
     this.addSprite();
     if (DEBUG) {
       this.debug();
     }
+  }
+
+  onStateUpdate(newTower: SerializedTower) {
+    this.health = newTower.health;
+    this.maxHealth = newTower.maxHealth;
+    this.attackRange = toScreen(newTower.attackRange);
   }
 
   addSprite() {
@@ -72,22 +55,6 @@ export class Tower extends Actor {
     this.addChild(sprite);
   }
 
-  get attack() {
-    return this.blueprint.attack;
-  }
-
-  get range() {
-    return this.blueprint.range;
-  }
-
-  get maxHealth() {
-    return this.blueprint.health;
-  }
-
-  onPreUpdate(_engine: Engine, delta: number) {
-    this.stateMachine.update(delta);
-  }
-
   debugAttackRange() {
     const color = Color.Red.clone();
     color.a = 0.25;
@@ -95,7 +62,7 @@ export class Tower extends Actor {
     const circle = new Circle({
       color,
       strokeColor: Color.Red,
-      radius: (this.range * TILE_SIZE) / 2
+      radius: this.attackRange / 2
     });
 
     const actor = new Actor({

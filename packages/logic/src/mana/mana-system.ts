@@ -37,7 +37,7 @@ export class ManaSystem extends Entity {
   /**
    * Progress time for the mana system by delta many ms
    */
-  tick(delta: number) {
+  update(delta: number) {
     this.add(delta * this.rate);
   }
 

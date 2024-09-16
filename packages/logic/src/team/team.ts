@@ -1,7 +1,7 @@
-import { type Rectangle, type Serializable } from '@game/shared';
+import { type Rectangle, type Serializable, type StrictOmit } from '@game/shared';
 import { Player, type PlayerBlueprint, type SerializedPlayer } from '../player/player';
 import { GameSession } from '../game-session';
-import { Tower } from '../tower/tower';
+import { Tower, type SerializedTower } from '../tower/tower';
 import { Entity, type EntityId } from '../entity';
 
 /**
@@ -14,8 +14,9 @@ export type TeamBlueprint = {
 };
 
 export type SerializedTeam = {
-  players: SerializedPlayer[];
+  players: Array<StrictOmit<SerializedPlayer, 'towers'>>;
   deployZone: Rectangle;
+  towers: SerializedTower[];
 };
 
 export class Team extends Entity implements Serializable<SerializedTeam> {
@@ -51,18 +52,25 @@ export class Team extends Entity implements Serializable<SerializedTeam> {
     return result;
   }
 
-  // get units() {
-  //   const result: Unit[] = [];
-  //   this.players.forEach(p => {
-  //     result.push(...p.units);
-  //   });
-  //   return result;
-  // }
+  update(delta: number) {
+    this.players.forEach(player => {
+      player.update(delta);
+    });
+  }
 
   serialize() {
-    return {
+    const result: SerializedTeam = {
       deployZone: this.deployZone,
-      players: [...this.players].map(player => player.serialize())
+      towers: [],
+      players: []
     };
+
+    for (const player of this.players) {
+      const { towers, ...rest } = player.serialize();
+      result.towers.push(...towers);
+      result.players.push(rest);
+    }
+
+    return result;
   }
 }

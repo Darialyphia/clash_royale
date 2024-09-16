@@ -11,9 +11,9 @@ export const random = (max: number) => Math.random() * max;
 
 export const randomInt = (max: number) => Math.floor(random(max + 1));
 
-export const indexToPoint = (length: number, idx: number): Point => ({
-  x: idx % length,
-  y: Math.floor(idx / length)
+export const indexToPoint = (idx: number, width: number): Point => ({
+  x: idx % width,
+  y: Math.floor(idx / width)
 });
 
 export const pointToIndex = ({ x, y }: Point, width: number) => width * y + x;

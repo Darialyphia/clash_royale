@@ -1,4 +1,5 @@
 import { TILE_SIZE } from '@/constants';
+import { Point } from '@game/shared';
 import { Vector } from 'excalibur';
 
 export class GameCoords {
@@ -15,3 +16,6 @@ export class GameCoords {
     return this.coords.scale(TILE_SIZE);
   }
 }
+
+export const toScreen = (val: number) => val * TILE_SIZE;
+export const toScreenVector = (vec: Point) => new Vector(vec.x, vec.y).scale(TILE_SIZE);

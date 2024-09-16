@@ -1,6 +1,6 @@
+import { BoardCellBlueprint, GameSessionBlueprint } from '@game/logic';
 import { mapRange } from '@game/shared';
 import { Color } from 'excalibur';
-import { GameSessionBlueprint } from './entities/game-session';
 
 export const DEBUG = true;
 export const TILE_SIZE = 32;
@@ -33,29 +33,32 @@ export const INNER_TOWER_RANGE = 3;
 export const INNER_TOWER_ATTACK = 15;
 export const INNER_TOWER_HEALTH = 800;
 
-type AtlasCoord = [number, number];
-const GRASS: AtlasCoord = [0, 0];
-const WATER: AtlasCoord = [1, 0];
-const BRIDGE: AtlasCoord = [2, 0];
-const BRIDGE_B: AtlasCoord = [3, 0];
-const PATH_H: AtlasCoord = [0, 1];
-const PATH_V: AtlasCoord = [1, 1];
-const PATH_CORNER_TL: AtlasCoord = [2, 1];
-const PATH_CORNER_TR: AtlasCoord = [3, 1];
-const PATH_CORNER_BL: AtlasCoord = [0, 2];
-const PATH_CORNER_BR: AtlasCoord = [1, 2];
+const GRASS: BoardCellBlueprint = { atlasCoords: [0, 0], solid: false };
+const WATER: BoardCellBlueprint = { atlasCoords: [1, 0], solid: true };
+const BRIDGE: BoardCellBlueprint = { atlasCoords: [2, 0], solid: false };
+const BRIDGE_B: BoardCellBlueprint = { atlasCoords: [3, 0], solid: true };
+const PATH_H: BoardCellBlueprint = { atlasCoords: [1, 0], solid: false };
+const PATH_V: BoardCellBlueprint = { atlasCoords: [1, 1], solid: false };
+const PATH_CORNER_TL: BoardCellBlueprint = { atlasCoords: [2, 1], solid: false };
+const PATH_CORNER_TR: BoardCellBlueprint = { atlasCoords: [3, 1], solid: false };
+const PATH_CORNER_BL: BoardCellBlueprint = { atlasCoords: [0, 2], solid: false };
+const PATH_CORNER_BR: BoardCellBlueprint = { atlasCoords: [1, 0], solid: false };
 
 export const SESSION_BLUEPRINT: GameSessionBlueprint = {
   // prettier-ignore
-  map: [
-    GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
-    PATH_CORNER_TL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_TR,
-    PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
-    GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
-    PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
-    PATH_CORNER_BL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_BR,
-    GRASS,          GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, GRASS,
-  ],
+  board: {
+    width: MAP_COLS,
+    height: MAP_ROWS,
+    cells: [
+      GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
+      PATH_CORNER_TL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_TR,
+      PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
+      GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
+      PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
+      PATH_CORNER_BL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_BR,
+      GRASS,          GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, GRASS,
+    ]
+  },
   teams: [
     {
       deployZone: { x: 0, y: 0, width: 5, height: MAP_ROWS },
@@ -71,7 +74,7 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
             initialValue: 0,
             baseRechargeRate: 0.001,
             maxCapacity: 5,
-            id: "mana1"
+            id: 'mana1'
           }
         }
       ]
@@ -90,7 +93,7 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
             initialValue: 0,
             baseRechargeRate: 0.001,
             maxCapacity: 10,
-            id: "mana2"
+            id: 'mana2'
           }
         }
       ]

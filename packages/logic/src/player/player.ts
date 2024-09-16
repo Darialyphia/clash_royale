@@ -22,6 +22,7 @@ export type PlayerBlueprint = {
  * The JSON serializable representation of a player that is sent to the game session subscrbers
  */
 export type SerializedPlayer = {
+  id: string;
   currentMana: number;
   maxMana: number;
   towers: SerializedTower[];
@@ -31,8 +32,6 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
   private session: GameSession;
 
   private team: Team;
-
-  // readonly units: Set<Unit> = new Set();
 
   readonly towers: Set<Tower> = new Set();
 
@@ -49,8 +48,8 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
     this.manaSystem = new ManaSystem(blueprint.manaSystem);
   }
 
-  tick(delta: number) {
-    this.manaSystem.tick(delta);
+  update(delta: number) {
+    this.manaSystem.update(delta);
   }
 
   equals(player: Player) {
@@ -93,19 +92,9 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
     return tower;
   }
 
-  // deployUnit(x: number, y: number, blueprint: UnitBlueprint) {
-  //   const unit = new Unit({
-  //     player: this,
-  //     position: { x, y },
-  //     blueprint
-  //   });
-  //   this.units.add(unit);
-
-  //   return unit;
-  // }
-
   serialize() {
     return {
+      id: this.id,
       currentMana: this.manaSystem.current(),
       maxMana: this.manaSystem.capacity(),
       towers: [...this.towers].map(tower => tower.serialize())

@@ -10,4 +10,6 @@ export abstract class Entity {
   equals(e: Entity) {
     return this.id == e.id;
   }
+
+  abstract update(delta: number): void;
 }
