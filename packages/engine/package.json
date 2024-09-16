@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "./src/index.ts",
   "devDependencies": {
+    "eslint-config-daria": "*",
     "tsup": "^6.4.0",
-    "typescript": "~5.0.0",
-    "eslint-config-daria": "*"
+    "typescript": "~5.0.0"
   },
   "dependencies": {
     "@game/shared": "*",
+    "eventemitter2": "^6.4.9",
     "nanoid": "^4.0.2",
     "zod": "^3.21.4"
   },
