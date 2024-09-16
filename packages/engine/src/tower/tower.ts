@@ -56,15 +56,15 @@ export class Tower extends Entity {
     attackRange: new Interceptable<number, Tower>()
   };
 
-  get attack(): number {
+  attack(): number {
     return this.interceptors.attack.getValue(this.blueprint.attack, this);
   }
 
-  get attackRange(): number {
+  attackRange(): number {
     return this.interceptors.attackRange.getValue(this.blueprint.attackRange, this);
   }
 
-  get maxHealth() {
+  maxHealth() {
     return this.blueprint.health;
   }
 

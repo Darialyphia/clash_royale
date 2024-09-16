@@ -1,4 +1,4 @@
-import {type Point, Vec2} from '@game/shared';
+import { type Point, Vec2 } from '@game/shared';
 import { GameSession } from '../game-session';
 import { Tower } from '../tower/tower';
 import { Team } from '../team/team';
@@ -45,7 +45,7 @@ export class Player extends Entity {
     return this.id === player.id;
   }
 
-  get opponents() {
+  opponents() {
     return this.session.teams.find(team => !team.equals(this.team))!.players;
   }
 
@@ -53,7 +53,7 @@ export class Player extends Entity {
     const tower = new Tower({
       position: Vec2.from({ x, y }),
       blueprint: {
-        id: this.id + "_ti",
+        id: this.id + '_ti',
         attack: config.INNER_TOWER_ATTACK,
         health: config.INNER_TOWER_HEALTH,
         attackRange: config.INNER_TOWER_RANGE

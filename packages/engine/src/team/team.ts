@@ -35,7 +35,7 @@ export class Team extends Entity {
     return this.session.teams.find;
   }
 
-  get towers() {
+  towers() {
     const result: Tower[] = [];
     this.players.forEach(p => {
       result.push(...p.towers);
