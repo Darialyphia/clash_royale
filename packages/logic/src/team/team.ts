@@ -1,4 +1,4 @@
-import { type Rectangle } from '@game/shared';
+import { type Rectangle, type Serializable } from '@game/shared';
 import { Player, type PlayerBlueprint } from '../player/player';
 import { GameSession } from '../game-session';
 import { Tower } from '../tower/tower';
@@ -10,7 +10,7 @@ export type TeamBlueprint = {
   players: PlayerBlueprint[];
 };
 
-export class Team extends Entity {
+export class Team extends Entity implements Serializable {
   private readonly session: GameSession;
 
   readonly players: Set<Player>;
@@ -50,4 +50,8 @@ export class Team extends Entity {
   //   });
   //   return result;
   // }
+
+  serialize() {
+    return {};
+  }
 }

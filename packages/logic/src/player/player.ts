@@ -1,4 +1,4 @@
-import { type Point, Vec2 } from '@game/shared';
+import { type Point, type Serializable, Vec2 } from '@game/shared';
 import { GameSession } from '../game-session';
 import { Tower } from '../tower/tower';
 import { Team } from '../team/team';
@@ -15,7 +15,7 @@ export type PlayerBlueprint = {
   manaSystem: ManaSystemBlueprint;
 };
 
-export class Player extends Entity {
+export class Player extends Entity implements Serializable {
   private session: GameSession;
 
   private team: Team;
@@ -91,4 +91,8 @@ export class Player extends Entity {
 
   //   return unit;
   // }
+
+  serialize() {
+    return {};
+  }
 }

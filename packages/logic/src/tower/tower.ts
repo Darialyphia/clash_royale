@@ -1,4 +1,4 @@
-import type { Values, Vec2 } from '@game/shared';
+import type { Point, Serializable, Values, Vec2 } from '@game/shared';
 import { Entity } from '../entity';
 import type { StateMachine } from '../utils/state-machine';
 import type { Player } from '../player/player';
@@ -6,10 +6,22 @@ import StateMachineBuilder from '../utils/state-machine';
 import { TowerIdleState } from './states/idle-state';
 import { Interceptable, type inferInterceptor } from '../utils/interceptable';
 
+/**
+ * The shape of the input used to create a tower
+ */
 export type TowerBlueprint = {
   id: string;
   attack: number;
   attackRange: number;
+  health: number;
+};
+
+/**
+ * The JSON serializable representation of a tower that is sent to the gamee session subscrbers
+ */
+export type SerializedTower = {
+  pos: Point;
+  maxHealth: number;
   health: number;
 };
 
@@ -21,7 +33,7 @@ export type TowerState = Values<typeof TOWER_STATES>;
 
 export type TowerInterceptor = Tower['interceptors'];
 
-export class Tower extends Entity {
+export class Tower extends Entity implements Serializable<SerializedTower> {
   private stateMachine: StateMachine<Tower, TowerState>;
 
   private pos: Vec2;
@@ -30,7 +42,7 @@ export class Tower extends Entity {
 
   readonly player: Player;
 
-  health: number;
+  private health: number;
 
   constructor({
     position,
@@ -68,6 +80,10 @@ export class Tower extends Entity {
     return this.blueprint.health;
   }
 
+  currentHealth() {
+    return this.health;
+  }
+
   update(delta: number) {
     this.stateMachine.update(delta);
   }
@@ -86,5 +102,13 @@ export class Tower extends Entity {
     interceptor: inferInterceptor<TowerInterceptor[T]>
   ) {
     this.interceptors[key].remove(interceptor as any);
+  }
+
+  serialize() {
+    return {
+      pos: this.pos,
+      health: this.health,
+      maxHealth: this.maxHealth()
+    };
   }
 }

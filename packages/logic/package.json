@@ -1,5 +1,5 @@
 {
-  "name": "@game/engine",
+  "name": "@game/logic",
   "version": "1.0.0",
   "main": "./src/index.ts",
   "devDependencies": {

@@ -85,8 +85,8 @@ export type JSONValue =
 
 export type JSONObject = { [x: string]: JSONValue };
 
-export interface Serializable {
-  serialize(): JSONValue;
+export interface Serializable<T extends JSONValue = JSONValue> {
+  serialize(): T;
 }
 
 export type LastOf<T> =
