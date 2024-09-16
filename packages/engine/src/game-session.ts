@@ -53,7 +53,7 @@ export class GameSession implements Serializable {
   }
 
   private update() {
-    const now = Date.now();
+    const now = performance.now();
     const delta = Math.max(0, now - this.lastTickTimestamp);
     console.log('TODO: process inputs and update entities / systems');
     this.lastTickTimestamp = now;
@@ -66,7 +66,7 @@ export class GameSession implements Serializable {
   start() {
     if (this.isRunning) return;
     this.isRunning = true;
-    this.lastTickTimestamp = Date.now();
+    this.lastTickTimestamp = performance.now();
     this.interval = setInterval(this.tick.bind(this), 1000 / config.TICKS_PER_SECOND);
   }
 

@@ -1,21 +1,21 @@
 import { Entity } from '../entity';
 
 export type ManaSystemBlueprint = {
-  id: string,
+  id: string;
   /**
    * The mana system will start with this value, unless it is larger than maxCapacity,
    * in which case it will be set to the capacity;
    */
-  initialValue: number,
+  initialValue: number;
   /**
    * Charging rate of the mana system in mana/ms
    */
-  baseRechargeRate: number,
+  baseRechargeRate: number;
   /**
    * The mana system will never charge beyond this value
    */
-  maxCapacity: number,
-}
+  maxCapacity: number;
+};
 
 export class ManaSystem extends Entity {
   /**
