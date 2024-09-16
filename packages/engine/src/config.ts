@@ -1,3 +1,6 @@
+export type Config = typeof config;
+export type ConfigKey = keyof typeof config;
+
 export const config = {
   DEBUG: true,
   TOWER_WIDTH: 1,
@@ -8,4 +11,4 @@ export const config = {
   INNER_TOWER_RANGE: 3,
   INNER_TOWER_ATTACK: 15,
   INNER_TOWER_HEALTH: 800
-};
+} as const;
