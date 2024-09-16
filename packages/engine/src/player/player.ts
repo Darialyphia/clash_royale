@@ -1,4 +1,4 @@
-import { type Point } from '@game/shared';
+import {type Point, Vec2} from '@game/shared';
 import { GameSession } from '../game-session';
 import { Tower } from '../tower/tower';
 import { Team } from '../team/team';
@@ -42,11 +42,12 @@ export class Player extends Entity {
 
   addInnerTower(x: number, y: number) {
     const tower = new Tower({
-      position: { x, y },
+      position: Vec2.from({ x, y }),
       blueprint: {
+        id: this.id + "_ti",
         attack: config.INNER_TOWER_ATTACK,
         health: config.INNER_TOWER_HEALTH,
-        range: config.INNER_TOWER_RANGE
+        attackRange: config.INNER_TOWER_RANGE
       },
       player: this
     });
@@ -57,11 +58,12 @@ export class Player extends Entity {
 
   addOuterTower(x: number, y: number) {
     const tower = new Tower({
-      position: { x, y },
+      position: Vec2.from({ x, y }),
       blueprint: {
+        id: this.id + `_to_${this.towers.size + 1}`,
         attack: config.OUTER_TOWER_ATTACK,
         health: config.OUTER_TOWER_HEALTH,
-        range: config.OUTER_TOWER_RANGE
+        attackRange: config.OUTER_TOWER_RANGE
       },
       player: this
     });

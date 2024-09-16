@@ -1,4 +1,4 @@
-import { State } from '@/utils/state-machine';
+import type { State } from '../../utils/state-machine';
 import { Tower } from '../tower';
 
 export class TowerIdleState implements State<Tower> {

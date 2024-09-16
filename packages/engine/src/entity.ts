@@ -3,7 +3,7 @@ export type EntityId = string;
 export abstract class Entity {
   readonly id: string;
 
-  constructor(id: EntityId) {
+  protected constructor(id: EntityId) {
     this.id = id;
   }
 
