@@ -4,5 +4,5 @@ import { Tower } from '../tower.entity';
 export class TowerIdleState implements State<Tower> {
   spawnCountdown!: number;
 
-  onUpdate(tower: Tower, delta: number) {}
+  onUpdate(_tower: Tower, _delta: number) {}
 }

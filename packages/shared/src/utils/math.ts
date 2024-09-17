@@ -1,6 +1,5 @@
 import { clamp } from './helpers';
-import type { Point } from '../types';
-import type { Matrix } from '../types/utils';
+import type { Point, Matrix } from '../types';
 
 export const rotateMatrix = <T>(
   matrix: Matrix<T>,
@@ -12,7 +11,7 @@ export const rotateMatrix = <T>(
     );
   }
   const rotate90 = <T>(m: Matrix<T>) =>
-    m[0].map((val, index) => m.map(row => row[index]).reverse());
+    m[0].map((_, index) => m.map(row => row[index]).reverse());
 
   let result = matrix;
 

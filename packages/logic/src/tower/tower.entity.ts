@@ -79,6 +79,10 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     return this.interceptors.attack.getValue(this.blueprint.attack, this);
   }
 
+  position(): Vec2 {
+    return this.pos;
+  }
+
   attackRange(): number {
     return this.interceptors.attackRange.getValue(this.blueprint.attackRange, this);
   }

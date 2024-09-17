@@ -1,4 +1,4 @@
-import { Actor, Color, Engine, Font, FontUnit, Label, TextAlign } from 'excalibur';
+import { Actor, Color, Font, FontUnit, Label, TextAlign } from 'excalibur';
 import { TILE_SIZE, WIDTH } from '@/constants.ts';
 import { SerializedPlayer } from '@game/logic';
 

@@ -1,4 +1,4 @@
-import type { AnyFunction, AnyObject, Defined, Nullable } from '../types/utils';
+import type { AnyFunction, Defined, Nullable } from '../types';
 
 export const isObject = (x: unknown): x is object =>
   typeof x === 'object' && x !== null && !Array.isArray(x);
