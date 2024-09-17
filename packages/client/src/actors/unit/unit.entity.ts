@@ -4,9 +4,9 @@ import { UnitSpawningState } from './states/spawning-state';
 import { UnitMovingState } from './states/moving-state';
 import { UnitAttackingState } from './states/attacking-state';
 import StateMachineBuilder, { StateMachine } from '@/utils/state-machine';
-import { Player } from '../player/player';
 import { DEBUG, TILE_SIZE } from '@/constants';
 import { GameCoords } from '@/utils/game-coords';
+import { Player } from '@game/logic/src/player/player.ts';
 
 export type UnitBlueprint = {
   speed: number;
@@ -89,7 +89,7 @@ export class Unit extends Actor {
   }
 
   get enemyTowers() {
-    return [...this.player.opponents].map(enemy => [...enemy.towers]).flat();
+    return [...this.player.opponents()].map(enemy => [...enemy.towers]).flat();
   }
 
   onPreUpdate(_engine: Engine, delta: number) {

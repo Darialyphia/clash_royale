@@ -1,8 +1,9 @@
-import { Actor, Color, Vector } from 'excalibur';
+import { Color, Vector } from 'excalibur';
 import { Unit } from '../unit.entity';
 import { State } from '@/utils/state-machine';
 import { GameCoords } from '@/utils/game-coords';
 import { TILE_SIZE } from '@/constants';
+import { Tower } from '@game/logic/src/tower/tower.ts';
 
 export class UnitMovingState implements State<Unit> {
   target: Unit | null = null;
@@ -40,10 +41,10 @@ export class UnitMovingState implements State<Unit> {
     if (this.target) return;
 
     let closestDistance = Infinity;
-    let closestTarget: Actor | null = null;
+    let closestTarget: Tower | null = null;
 
     unit.enemyTowers.forEach(target => {
-      const distance = unit.pos.distance(target.pos);
+      const distance = unit.pos.distance(new Vector(target.position().x, target.position().y));
       if (distance >= closestDistance) return;
 
       closestDistance = distance;

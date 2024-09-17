@@ -46,17 +46,14 @@ type BoardCell = {
 };
 
 export class Board extends Entity implements Serializable<SerializedBoard> {
-  private session: GameSession;
-
   private width: number;
 
   private height: number;
 
   private cells: BoardCell[];
 
-  constructor(session: GameSession, blueprint: BoardBlueprint) {
+  constructor(_session: GameSession, blueprint: BoardBlueprint) {
     super(blueprint.id);
-    this.session = session;
     this.width = blueprint.width;
     this.height = blueprint.height;
     this.cells = blueprint.cells.map((cell, index) => {
@@ -70,6 +67,9 @@ export class Board extends Entity implements Serializable<SerializedBoard> {
 
   getCellAt(x: number, y: number) {
     return this.cells[pointToIndex({ x, y }, this.width)];
+  }
+
+  update(_delta: number) {
   }
 
   serialize() {
