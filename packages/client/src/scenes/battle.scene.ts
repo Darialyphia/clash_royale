@@ -31,6 +31,9 @@ export class BattleScene extends Scene {
       this.updateActors();
     });
 
+    this.input.pointers.on('up', () => {
+      session.dispatch({ type: 'test', payload: { playerId: this.myPlayer.id } });
+    });
     session.start();
   }
 

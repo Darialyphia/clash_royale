@@ -30,7 +30,7 @@ export class TowerActor extends Actor {
     this.maxHealth = blueprint.maxHealth;
     this.health = blueprint.health;
 
-    // this.addSprite();
+    this.addSprite();
     if (DEBUG) {
       this.debug();
     }
@@ -44,11 +44,9 @@ export class TowerActor extends Actor {
 
   addSprite() {
     const graphics = resources.towersheet.getAnimation('idle')!;
-
     const sprite = new Actor({
-      x: this.width - graphics.width,
-      y: this.height - graphics.height,
-      anchor: new Vector(0, 0)
+      x: (this.width - graphics.width) / 2,
+      y: (this.height - graphics.height) / 2
     });
 
     sprite.graphics.use(graphics);
