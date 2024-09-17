@@ -13,7 +13,10 @@ export class TowerActor extends Actor {
   health: number;
 
   constructor(blueprint: SerializedTower) {
-    const { x, y } = new GameCoords(blueprint.pos.x, blueprint.pos.y).toScreenCoords();
+    const { x, y } = new GameCoords(
+      blueprint.position.x,
+      blueprint.position.y
+    ).toScreenCoords();
 
     super({
       x,
@@ -25,9 +28,7 @@ export class TowerActor extends Actor {
     });
 
     this.attackRange = toScreen(blueprint.attackRange);
-
     this.maxHealth = blueprint.maxHealth;
-
     this.health = blueprint.health;
 
     this.addSprite();
@@ -57,7 +58,7 @@ export class TowerActor extends Actor {
 
   debugAttackRange() {
     const color = Color.Red.clone();
-    color.a = 0.25;
+    color.a = 0.15;
 
     const circle = new Circle({
       color,

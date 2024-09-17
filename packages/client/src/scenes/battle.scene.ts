@@ -7,14 +7,18 @@ import {
   SerializedBoard,
   SerializedGameStateSnapshot,
   SerializedTeam,
-  SerializedTower
+  SerializedTower,
+  SerializedUnit
 } from '@game/logic';
 import { TowerActor } from '@/actors/tower/tower';
+import { UnitActor } from '@/actors/unit/unit';
 
 export class BattleScene extends Scene {
   private gameState!: SerializedGameStateSnapshot['state'];
 
   private towerActorsMap = new Map<string, TowerActor>();
+
+  private unitActorsMap = new Map<string, UnitActor>();
 
   private playerActorsMap = new Map<string, PlayerActor>();
 
@@ -74,6 +78,17 @@ export class BattleScene extends Scene {
     this.towerActorsMap.get(tower.id)!.onStateUpdate(tower);
   }
 
+  private createOrUpdateUnit(unit: SerializedUnit) {
+    if (!this.unitActorsMap.has(unit.id)) {
+      const newUnit = new UnitActor(unit);
+      this.unitActorsMap.set(unit.id, newUnit);
+      this.add(newUnit);
+      return;
+    }
+
+    this.unitActorsMap.get(unit.id)!.onStateUpdate(unit);
+  }
+
   private createOrUpdatePlayer(
     player: SerializedTeam['players'][number],
     teamIndex: number
@@ -93,6 +108,7 @@ export class BattleScene extends Scene {
 
   private updateActors() {
     this.updateTowers();
+    this.updateUnits();
     this.updateTeams();
   }
 
@@ -110,6 +126,24 @@ export class BattleScene extends Scene {
       if (!towerIds.has(towerId)) {
         tower.kill();
         this.towerActorsMap.delete(towerId);
+      }
+    }
+  }
+
+  private updateUnits() {
+    // add or create unit actors
+    const unitIds = new Set<string>();
+    this.gameState.units.forEach(unit => {
+      this.createOrUpdateUnit(unit);
+      unitIds.add(unit.id);
+    });
+
+    // delete towers that are not here anymore
+    // later on we can handle this more gracefully, like playing a dying animations etc
+    for (const [unitId, unit] of this.unitActorsMap.entries()) {
+      if (!unitIds.has(unitId)) {
+        unit.kill();
+        this.unitActorsMap.delete(unitId);
       }
     }
   }

@@ -7,6 +7,7 @@ export {
 export type { SerializedPlayer, PlayerBlueprint } from './player/player.entity';
 export type { SerializedTeam, TeamBlueprint } from './team/team.entity';
 export type { SerializedTower, TowerBlueprint } from './tower/tower.entity';
+export type { SerializedUnit, UnitBlueprint } from './unit/unit.entity';
 export type {
   BoardBlueprint,
   BoardCellBlueprint,

@@ -22,8 +22,10 @@ export type UnitBlueprint = {
   position: Point;
   attack: number;
   attackRange: number;
+  aggroRange: number;
   health: number;
   spawnTime: Milliseconds;
+  speed: number;
 };
 
 /**
@@ -32,10 +34,11 @@ export type UnitBlueprint = {
 export type SerializedUnit = {
   id: string;
   playerId: string;
-  pos: Point;
   maxHealth: number;
   health: number;
+  speed: number;
   attackRange: number;
+  aggroRange: number;
   position: Point;
   velocity: Point;
 };
@@ -87,6 +90,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   private interceptors = {
     attack: new Interceptable<number, Unit>(),
+    speed: new Interceptable<number, Unit>(),
     attackRange: new Interceptable<number, Unit>()
   };
 
@@ -101,8 +105,17 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
   velocity() {
     return Vec2.from(this.vel);
   }
-  attack(): number {
+
+  speed() {
+    return this.interceptors.speed.getValue(this.blueprint.speed, this);
+  }
+
+  attack() {
     return this.interceptors.attack.getValue(this.blueprint.attack, this);
+  }
+
+  aggroRange() {
+    return this.blueprint.aggroRange;
   }
 
   attackRange(): number {
@@ -145,7 +158,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     this.vel.scale({ x: 0, y: 0 });
   }
 
-  seek(vec: Vec2) {
+  moveTowards(vec: Vec2) {
     this.vel = vec;
   }
 
@@ -157,12 +170,13 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     return {
       id: this.id,
       playerId: this.player.id,
-      pos: this.pos,
       health: this.health,
       maxHealth: this.maxHealth(),
       attackRange: this.attackRange(),
+      aggroRange: this.aggroRange(),
       position: this.pos.serialize(),
-      velocity: this.vel.serialize()
+      velocity: this.vel.serialize(),
+      speed: this.speed()
     };
   }
 }

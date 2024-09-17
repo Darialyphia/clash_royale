@@ -21,7 +21,7 @@ export type TowerBlueprint = {
  */
 export type SerializedTower = {
   id: string;
-  pos: Point;
+  position: Point;
   maxHealth: number;
   health: number;
   playerId: string;
@@ -79,10 +79,6 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     return this.interceptors.attack.getValue(this.blueprint.attack, this);
   }
 
-  position(): Vec2 {
-    return this.pos;
-  }
-
   attackRange(): number {
     return this.interceptors.attackRange.getValue(this.blueprint.attackRange, this);
   }
@@ -119,7 +115,7 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     return {
       id: this.id,
       playerId: this.player.id,
-      pos: this.pos,
+      position: this.pos,
       health: this.health,
       maxHealth: this.maxHealth(),
       attackRange: this.attackRange()

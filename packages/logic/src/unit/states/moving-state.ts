@@ -23,7 +23,7 @@ export class UnitMovingState implements State<Unit> {
 
   private move(unit: Unit) {
     if (!this.target) return;
-    unit.seek(this.target.position().sub(unit.position()));
+    unit.moveTowards(this.target.position().sub(unit.position()));
   }
 
   private seek(unit: Unit) {

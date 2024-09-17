@@ -12,6 +12,9 @@ export const HEIGHT = TILE_SIZE * MAP_ROWS;
 export const TOWER_WIDTH = 1;
 export const TOWER_HEIGHT = 1;
 
+export const UNIT_WIDTH = 0.5;
+export const UNIT_HEIGHT = 0.5;
+
 export const BG_COLOR = Color.fromHSL(mapRange(250, [0, 360], [0, 1]), 0.3, 0.25);
 export const TEAM_1_DEPLOY_ZONE_COLOR = Color.fromHSL(
   mapRange(140, [0, 360], [0, 1]),
