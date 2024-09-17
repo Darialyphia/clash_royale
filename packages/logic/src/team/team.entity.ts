@@ -1,7 +1,11 @@
 import { type Rectangle, type Serializable, type StrictOmit } from '@game/shared';
-import { Player, type PlayerBlueprint, type SerializedPlayer } from '../player/player';
+import {
+  Player,
+  type PlayerBlueprint,
+  type SerializedPlayer
+} from '../player/player.entity';
 import { GameSession } from '../game-session';
-import { Tower, type SerializedTower } from '../tower/tower';
+import { Tower, type SerializedTower } from '../tower/tower.entity';
 import { Entity, type EntityId } from '../entity';
 
 /**

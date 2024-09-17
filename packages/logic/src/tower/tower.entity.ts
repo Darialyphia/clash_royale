@@ -1,7 +1,7 @@
-import type { Point, Serializable, Values, Vec2 } from '@game/shared';
+import { type Point, type Serializable, type Values, Vec2 } from '@game/shared';
 import { Entity } from '../entity';
 import type { StateMachine } from '../utils/state-machine';
-import type { Player } from '../player/player';
+import type { Player } from '../player/player.entity';
 import StateMachineBuilder from '../utils/state-machine';
 import { TowerIdleState } from './states/idle-state';
 import { Interceptable, type inferInterceptor } from '../utils/interceptable';
@@ -39,9 +39,9 @@ export type TowerInterceptor = Tower['interceptors'];
 export class Tower extends Entity implements Serializable<SerializedTower> {
   private stateMachine: StateMachine<Tower, TowerState>;
 
-  private pos: Vec2;
-
   private readonly blueprint: TowerBlueprint;
+
+  private pos: Vec2;
 
   readonly player: Player;
 
@@ -70,6 +70,10 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     attack: new Interceptable<number, Tower>(),
     attackRange: new Interceptable<number, Tower>()
   };
+
+  position() {
+    return Vec2.from(this.pos);
+  }
 
   attack(): number {
     return this.interceptors.attack.getValue(this.blueprint.attack, this);

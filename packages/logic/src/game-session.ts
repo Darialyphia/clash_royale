@@ -1,10 +1,10 @@
 import type { StrictOmit } from '@game/shared';
-import { Team, type SerializedTeam, type TeamBlueprint } from './team/team';
+import { Team, type SerializedTeam, type TeamBlueprint } from './team/team.entity';
 import { nanoid } from 'nanoid';
 import { config } from './config';
 import { TypedEventEmitter } from './utils/typed-emitter';
-import { Board, type BoardBlueprint, type SerializedBoard } from './board/board';
-import type { SerializedTower } from './tower/tower';
+import { Board, type BoardBlueprint, type SerializedBoard } from './board/board.entity';
+import type { SerializedTower } from './tower/tower.entity';
 
 export type SerializedGameStateSnapshot = {
   state: {

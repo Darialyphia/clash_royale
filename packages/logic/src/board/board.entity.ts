@@ -72,6 +72,10 @@ export class Board extends Entity implements Serializable<SerializedBoard> {
     return this.cells[pointToIndex({ x, y }, this.width)];
   }
 
+  update() {
+    return;
+  }
+
   serialize() {
     return {
       width: this.width,

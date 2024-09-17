@@ -1,8 +1,16 @@
-import type { Point, Serializable } from '../types';
+import type { Point, Radians, Serializable } from '../types';
 
 export class Vec2 implements Serializable {
   static from(pt: Point) {
     return new Vec2(pt.x, pt.y);
+  }
+
+  static fromAngle(angle: Radians) {
+    return new Vec2(Math.cos(angle), Math.sin(angle));
+  }
+
+  static get Zero() {
+    return new Vec2(0, 0);
   }
 
   static add(vec1: Point, vec2: Point) {
@@ -14,11 +22,7 @@ export class Vec2 implements Serializable {
   }
 
   static scale(vec1: Point, vec2: Point) {
-    return Vec2.from(vec1).mul(vec2);
-  }
-
-  static div(vec1: Point, vec2: Point) {
-    return Vec2.from(vec1).div(vec2);
+    return Vec2.from(vec1).scale(vec2);
   }
 
   constructor(
@@ -59,15 +63,9 @@ export class Vec2 implements Serializable {
     return this;
   }
 
-  mul({ x, y }: Point) {
+  scale({ x, y }: Point) {
     this.x *= x;
     this.y *= y;
-
-    return this;
-  }
-  div({ x, y }: Point) {
-    this.x /= x;
-    this.y /= y;
 
     return this;
   }
@@ -83,5 +81,18 @@ export class Vec2 implements Serializable {
 
   angle() {
     return Math.atan2(this.y, this.x);
+  }
+
+  magnitude(): number {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
+  normalize() {
+    const magnitude = this.magnitude();
+    if (magnitude === 0) {
+      return Vec2.Zero;
+    }
+
+    return new Vec2(this.x / magnitude, this.y / magnitude);
   }
 }

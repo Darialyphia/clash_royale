@@ -1,10 +1,10 @@
 import { type Point, type Serializable, Vec2 } from '@game/shared';
 import { GameSession } from '../game-session';
-import { Tower, type SerializedTower } from '../tower/tower';
-import { Team } from '../team/team';
+import { Tower, type SerializedTower } from '../tower/tower.entity';
+import { Team } from '../team/team.entity';
 import { Entity } from '../entity';
 import { config } from '../config';
-import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system';
+import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system.entity';
 
 export type PlayerId = string;
 
