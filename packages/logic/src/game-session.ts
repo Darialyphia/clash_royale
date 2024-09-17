@@ -6,6 +6,8 @@ import { TypedEventEmitter } from './utils/typed-emitter';
 import { Board, type BoardBlueprint, type SerializedBoard } from './board/board.entity';
 import type { SerializedTower } from './tower/tower.entity';
 import type { SerializedUnit } from './unit/unit.entity';
+import { InputSystem } from './input/input-system';
+import type { SerializedInput } from './input/input';
 
 export type SerializedGameStateSnapshot = {
   state: {
@@ -52,6 +54,8 @@ export class GameSession {
 
   private lastTickTimestamp = 0;
 
+  private inputSystem = new InputSystem();
+
   constructor(options: GameSessionBlueprint) {
     this.board = new Board(this, { ...options.board, id: nanoid(6) });
     this.teams = options.teams.map(team => {
@@ -70,7 +74,7 @@ export class GameSession {
   }
 
   private processInputs() {
-    return;
+    this.inputSystem.process(this);
   }
 
   private update() {
@@ -100,7 +104,7 @@ export class GameSession {
       state: {
         teams: [team1, team2],
         towers: [...team1Towers, ...team2Towers],
-        units: [...team1Units, ...team1Units]
+        units: [...team1Units, ...team2Units]
       },
       events: []
     };
@@ -125,6 +129,10 @@ export class GameSession {
     this.isRunning = false;
     clearInterval(this.interval!);
     this.interval = null;
+  }
+
+  dispatch(input: SerializedInput) {
+    this.inputSystem.dispatch(input);
   }
 
   subscribe(cb: GameSessionSubscriber) {
