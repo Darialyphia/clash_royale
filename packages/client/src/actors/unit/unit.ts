@@ -22,8 +22,7 @@ export class UnitActor extends Actor {
       y,
       width: TILE_SIZE / 2,
       height: TILE_SIZE / 2,
-      color: Color.Blue,
-      anchor: new Vector(0, 0)
+      color: Color.Blue
     });
 
     this.maxHealth = blueprint.maxHealth;
@@ -57,8 +56,8 @@ export class UnitActor extends Actor {
     });
 
     const actor = new Actor({
-      x: (UNIT_WIDTH * TILE_SIZE) / 2,
-      y: (UNIT_HEIGHT * TILE_SIZE) / 2
+      x: 0,
+      y: 0
     });
     actor.graphics.use(circle);
     this.addChild(actor);
@@ -75,8 +74,8 @@ export class UnitActor extends Actor {
     });
 
     const actor = new Actor({
-      x: (UNIT_WIDTH * TILE_SIZE) / 2,
-      y: (UNIT_HEIGHT * TILE_SIZE) / 2
+      x: 0,
+      y: 0
     });
     actor.graphics.use(circle);
     this.addChild(actor);

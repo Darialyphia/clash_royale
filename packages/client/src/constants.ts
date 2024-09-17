@@ -40,12 +40,12 @@ const GRASS: BoardCellBlueprint = { atlasCoords: [0, 0], solid: false };
 const WATER: BoardCellBlueprint = { atlasCoords: [1, 0], solid: true };
 const BRIDGE: BoardCellBlueprint = { atlasCoords: [2, 0], solid: false };
 const BRIDGE_B: BoardCellBlueprint = { atlasCoords: [3, 0], solid: true };
-const PATH_H: BoardCellBlueprint = { atlasCoords: [1, 0], solid: false };
+const PATH_H: BoardCellBlueprint = { atlasCoords: [0, 1], solid: false };
 const PATH_V: BoardCellBlueprint = { atlasCoords: [1, 1], solid: false };
 const PATH_CORNER_TL: BoardCellBlueprint = { atlasCoords: [2, 1], solid: false };
 const PATH_CORNER_TR: BoardCellBlueprint = { atlasCoords: [3, 1], solid: false };
 const PATH_CORNER_BL: BoardCellBlueprint = { atlasCoords: [0, 2], solid: false };
-const PATH_CORNER_BR: BoardCellBlueprint = { atlasCoords: [1, 0], solid: false };
+const PATH_CORNER_BR: BoardCellBlueprint = { atlasCoords: [1, 2], solid: false };
 
 export const SESSION_BLUEPRINT: GameSessionBlueprint = {
   // prettier-ignore
@@ -68,10 +68,10 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
       players: [
         {
           id: 'player1',
-          innerTower: { x: 0, y: Math.floor(MAP_ROWS / 2) },
+          innerTower: { x: 0.5, y: Math.floor(MAP_ROWS / 2) + 0.5 },
           outerTowers: [
-            { x: 1, y: 1 },
-            { x: 1, y: MAP_ROWS - 2 }
+            { x: 1.5, y: 1.5 },
+            { x: 1.5, y: MAP_ROWS - 2 + 0.5 }
           ],
           manaSystem: {
             initialValue: 0,
@@ -87,10 +87,10 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
       players: [
         {
           id: 'player2',
-          innerTower: { x: MAP_COLS - 1, y: Math.floor(MAP_ROWS / 2) },
+          innerTower: { x: MAP_COLS - 1 + 0.5, y: Math.floor(MAP_ROWS / 2) + 0.5 },
           outerTowers: [
-            { x: MAP_COLS - 2, y: 1 },
-            { x: MAP_COLS - 2, y: MAP_ROWS - 2 }
+            { x: MAP_COLS - 2 + 0.5, y: 1.5 },
+            { x: MAP_COLS - 2 + 0.5, y: MAP_ROWS - 2 + 0.5 }
           ],
           manaSystem: {
             initialValue: 0,

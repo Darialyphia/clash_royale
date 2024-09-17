@@ -23,15 +23,14 @@ export class TowerActor extends Actor {
       y,
       width: TOWER_WIDTH * TILE_SIZE,
       height: TOWER_HEIGHT * TILE_SIZE,
-      color: Color.DarkGray,
-      anchor: new Vector(0, 0)
+      color: Color.DarkGray
     });
 
     this.attackRange = toScreen(blueprint.attackRange);
     this.maxHealth = blueprint.maxHealth;
     this.health = blueprint.health;
 
-    this.addSprite();
+    // this.addSprite();
     if (DEBUG) {
       this.debug();
     }
@@ -67,8 +66,8 @@ export class TowerActor extends Actor {
     });
 
     const actor = new Actor({
-      x: (TOWER_WIDTH * TILE_SIZE) / 2,
-      y: (TOWER_HEIGHT * TILE_SIZE) / 2
+      x: 0,
+      y: 0
     });
     actor.graphics.use(circle);
     this.addChild(actor);
@@ -85,7 +84,7 @@ export class TowerActor extends Actor {
       strokeColor: Color.Blue
     });
 
-    const actor = new Actor({ x: 0, y: 0, anchor: new Vector(0, 0) });
+    const actor = new Actor({ x: 0, y: 0 });
     actor.graphics.use(rect);
     this.addChild(actor);
   }
