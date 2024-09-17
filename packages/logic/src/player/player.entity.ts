@@ -5,6 +5,7 @@ import { Team } from '../team/team.entity';
 import { Entity } from '../entity';
 import { config } from '../config';
 import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system.entity';
+import type { SerializedUnit, Unit } from '../unit/unit.entity';
 
 export type PlayerId = string;
 
@@ -26,6 +27,7 @@ export type SerializedPlayer = {
   currentMana: number;
   maxMana: number;
   towers: SerializedTower[];
+  units: SerializedUnit[];
 };
 
 export class Player extends Entity implements Serializable<SerializedPlayer> {
@@ -34,6 +36,8 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
   private team: Team;
 
   readonly towers: Set<Tower> = new Set();
+
+  readonly units: Set<Unit> = new Set();
 
   readonly manaSystem: ManaSystem;
 
@@ -97,7 +101,8 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       id: this.id,
       currentMana: this.manaSystem.current(),
       maxMana: this.manaSystem.capacity(),
-      towers: [...this.towers].map(tower => tower.serialize())
+      towers: [...this.towers].map(tower => tower.serialize()),
+      units: [...this.units].map(unit => unit.serialize())
     };
   }
 }

@@ -5,11 +5,16 @@ import { config } from './config';
 import { TypedEventEmitter } from './utils/typed-emitter';
 import { Board, type BoardBlueprint, type SerializedBoard } from './board/board.entity';
 import type { SerializedTower } from './tower/tower.entity';
+import type { SerializedUnit } from './unit/unit.entity';
 
 export type SerializedGameStateSnapshot = {
   state: {
-    teams: [StrictOmit<SerializedTeam, 'towers'>, StrictOmit<SerializedTeam, 'towers'>];
+    teams: [
+      StrictOmit<SerializedTeam, 'towers' | 'units'>,
+      StrictOmit<SerializedTeam, 'towers' | 'units'>
+    ];
     towers: SerializedTower[];
+    units: SerializedUnit[];
   };
   events: any[]; // @TODO: define how we represent events that happened during a tick so that the client can triggers things like sounds, VFX...
 };
@@ -80,13 +85,22 @@ export class GameSession {
   }
 
   private serializeGameState(): SerializedGameStateSnapshot {
-    const { towers: team1Towers, ...team1 } = this.teams[0].serialize();
-    const { towers: team2Towers, ...team2 } = this.teams[1].serialize();
+    const {
+      towers: team1Towers,
+      units: team1Units,
+      ...team1
+    } = this.teams[0].serialize();
+    const {
+      towers: team2Towers,
+      units: team2Units,
+      ...team2
+    } = this.teams[1].serialize();
 
     return {
       state: {
         teams: [team1, team2],
-        towers: [...team1Towers, ...team2Towers]
+        towers: [...team1Towers, ...team2Towers],
+        units: [...team1Units, ...team1Units]
       },
       events: []
     };

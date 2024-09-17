@@ -6,7 +6,7 @@ import { UnitAttackingState } from './states/attacking-state';
 import StateMachineBuilder, { StateMachine } from '@/utils/state-machine';
 import { DEBUG, TILE_SIZE } from '@/constants';
 import { GameCoords } from '@/utils/game-coords';
-import { Player } from '@game/logic/src/player/player.ts';
+import { Player } from '@game/logic/src/player/player.entity';
 
 export type UnitBlueprint = {
   speed: number;

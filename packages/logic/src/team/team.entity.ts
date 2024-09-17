@@ -7,6 +7,7 @@ import {
 import { GameSession } from '../game-session';
 import { Tower, type SerializedTower } from '../tower/tower.entity';
 import { Entity, type EntityId } from '../entity';
+import type { SerializedUnit } from '../unit/unit.entity';
 
 /**
  * The shape of the input used to create a team
@@ -18,9 +19,10 @@ export type TeamBlueprint = {
 };
 
 export type SerializedTeam = {
-  players: Array<StrictOmit<SerializedPlayer, 'towers'>>;
+  players: Array<StrictOmit<SerializedPlayer, 'towers' | 'units'>>;
   deployZone: Rectangle;
   towers: SerializedTower[];
+  units: SerializedUnit[];
 };
 
 export class Team extends Entity implements Serializable<SerializedTeam> {
@@ -66,12 +68,14 @@ export class Team extends Entity implements Serializable<SerializedTeam> {
     const result: SerializedTeam = {
       deployZone: this.deployZone,
       towers: [],
+      units: [],
       players: []
     };
 
     for (const player of this.players) {
-      const { towers, ...rest } = player.serialize();
+      const { towers, units, ...rest } = player.serialize();
       result.towers.push(...towers);
+      result.units.push(...units);
       result.players.push(rest);
     }
 
