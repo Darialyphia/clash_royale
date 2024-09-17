@@ -11,7 +11,7 @@ export const rotateMatrix = <T>(
     );
   }
   const rotate90 = <T>(m: Matrix<T>) =>
-    m[0].map((_val, index) => m.map(row => row[index]).reverse());
+    m[0].map((_, index) => m.map(row => row[index]).reverse());
 
   let result = matrix;
 

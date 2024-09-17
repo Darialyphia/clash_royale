@@ -1,4 +1,7 @@
 module.exports = {
   root: true,
-  extends: ['daria/vue']
+  extends: ['daria/vue'],
+  rules: {
+    "no-unused-vars": ["warn"]
+  }
 };
