@@ -6,6 +6,7 @@ import {
   type SerializedInput
 } from './input';
 import type { GameSession } from '../game-session';
+import { TestInput } from './inputs/test.input';
 
 type GenericInputMap = Record<string, Constructor<Input<DefaultSchema>>>;
 
@@ -19,16 +20,6 @@ type ValidatedActionMap<T extends GenericInputMap> = {
 
 const validateActionMap = <T extends GenericInputMap>(data: ValidatedActionMap<T>) =>
   data;
-
-class TestInput extends Input<DefaultSchema> {
-  readonly name = 'test';
-
-  protected payloadSchema = defaultInputSchema;
-
-  impl() {
-    console.log('test action');
-  }
-}
 
 const inputMap = validateActionMap({
   test: TestInput

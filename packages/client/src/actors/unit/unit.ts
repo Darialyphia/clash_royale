@@ -1,7 +1,13 @@
 import { Actor, Circle, Color, Vector } from 'excalibur';
 import { DEBUG, TILE_SIZE } from '@/constants';
 import { GameCoords, toScreen } from '@/utils/game-coords';
-import { SerializedUnit } from '@game/logic';
+import { SerializedUnit, UNIT_STATES, UnitState } from '@game/logic';
+
+const unitColors: Record<UnitState, Color> = {
+  [UNIT_STATES.SPAWNING]: Color.Magenta,
+  [UNIT_STATES.MOVING]: Color.Blue,
+  [UNIT_STATES.ATTACKING]: Color.Red
+};
 
 export class UnitActor extends Actor {
   health: number;
@@ -20,7 +26,7 @@ export class UnitActor extends Actor {
       y,
       width: toScreen(blueprint.body.width),
       height: toScreen(blueprint.body.height),
-      color: Color.Blue
+      color: Color.Magenta
     });
 
     this.maxHealth = blueprint.health.max;
@@ -33,14 +39,21 @@ export class UnitActor extends Actor {
     }
   }
 
-  onStateUpdate(newTower: SerializedUnit) {
-    this.health = newTower.health.current;
-    this.maxHealth = newTower.health.max;
-    this.attackRange = toScreen(newTower.attackRange);
-    this.aggroRange = toScreen(newTower.aggroRange);
-    this.vel = new Vector(newTower.velocity.x, newTower.velocity.y)
-      .normalize()
-      .scale(toScreen(newTower.speed));
+  onStateUpdate(newUnit: SerializedUnit) {
+    this.health = newUnit.health.current;
+    this.maxHealth = newUnit.health.max;
+    this.attackRange = toScreen(newUnit.attackRange);
+    this.aggroRange = toScreen(newUnit.aggroRange);
+    this.color = unitColors[newUnit.state];
+    // There is a bug with Excalibur's Vector.normalize() that returns {0,1} when normalizing a vector with a mmagnitude of 0
+    // it swill be fixed in the next Excalibur Vue.version
+    // see https://github.com/excaliburjs/Excalibur/commit/46ba314ebb751214dffb63ed1465adededfd8ec7#diff-06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4ed
+    const vel = new Vector(newUnit.velocity.x, newUnit.velocity.y);
+    if (vel.distance() === 0) {
+      this.vel = Vector.Zero;
+    } else {
+      this.vel = vel.normalize().scale(toScreen(newUnit.speed));
+    }
   }
 
   debugAttackRange() {

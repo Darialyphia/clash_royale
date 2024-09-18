@@ -21,7 +21,6 @@ import { UnitAttackingState } from './states/attacking-state';
  */
 export type UnitBlueprint = {
   id: string;
-  position: Point;
   attack: number;
   attackRange: number;
   aggroRange: number;
@@ -72,6 +71,12 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   private vel: Vec2;
 
+  private interceptors = {
+    attack: new Interceptable<number, Unit>(),
+    speed: new Interceptable<number, Unit>(),
+    attackRange: new Interceptable<number, Unit>()
+  };
+
   constructor({
     position,
     blueprint,
@@ -94,11 +99,26 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       .build(this, UNIT_STATES.SPAWNING);
   }
 
-  private interceptors = {
-    attack: new Interceptable<number, Unit>(),
-    speed: new Interceptable<number, Unit>(),
-    attackRange: new Interceptable<number, Unit>()
-  };
+  serialize() {
+    return {
+      id: this.id,
+      playerId: this.player.id,
+      state: this.stateMachine.state(),
+      health: { current: this.health, max: this.maxHealth() },
+      attackRange: this.attackRange(),
+      aggroRange: this.aggroRange(),
+      body: this.bbox.serialize(),
+      velocity: this.vel.serialize(),
+      speed: this.speed()
+    };
+  }
+
+  update(delta: number) {
+    this.stateMachine.update(delta);
+    this.bbox.moveTo(
+      Vec2.from(this.bbox).add(this.vel.normalize().scale((this.speed() * delta) / 1000))
+    );
+  }
 
   spawnTime() {
     return this.blueprint.spawnTime;
@@ -136,8 +156,11 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     return this.health;
   }
 
-  update(delta: number) {
-    this.stateMachine.update(delta);
+  enemies() {
+    return this.player
+      .opponents()
+      .map(player => [...player.units, ...player.towers])
+      .flat();
   }
 
   addInterceptor<T extends keyof UnitInterceptor>(
@@ -161,7 +184,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
   }
 
   stopMoving() {
-    this.vel.scale({ x: 0, y: 0 });
+    this.vel.scale(0);
   }
 
   moveTowards(vec: Vec2) {
@@ -170,19 +193,5 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   startAttacking() {
     this.stateMachine.setState(UNIT_STATES.ATTACKING);
-  }
-
-  serialize() {
-    return {
-      id: this.id,
-      playerId: this.player.id,
-      state: this.stateMachine.state(),
-      health: { current: this.health, max: this.maxHealth() },
-      attackRange: this.attackRange(),
-      aggroRange: this.aggroRange(),
-      body: this.bbox.serialize(),
-      velocity: this.vel.serialize(),
-      speed: this.speed()
-    };
   }
 }

@@ -74,6 +74,10 @@ export class Bbox implements Serializable<Rectangle> {
     return new Vec2(this.xmax, this.ymax);
   }
 
+  moveTo(point: Point) {
+    this.center = Vec2.from(point);
+  }
+
   collidesWith(other: Bbox): boolean {
     return !(
       this.xmax < other.xmin ||

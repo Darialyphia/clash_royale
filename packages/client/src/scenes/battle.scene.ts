@@ -1,4 +1,4 @@
-import { Engine, Scene, TileMap, Vector } from 'excalibur';
+import { Engine, Scene, TileMap, Vector, type PointerEvent } from 'excalibur';
 import { HEIGHT, MAP_COLS, MAP_ROWS, SESSION_BLUEPRINT, WIDTH } from '../constants';
 import { mapSheet } from '../resources';
 import { PlayerActor } from '@/actors/player/player';
@@ -12,8 +12,11 @@ import {
 } from '@game/logic';
 import { TowerActor } from '@/actors/tower/tower';
 import { UnitActor } from '@/actors/unit/unit';
+import { toWorldVector } from '@/utils/game-coords';
 
 export class BattleScene extends Scene {
+  private session!: GameSession;
+
   private gameState!: SerializedGameStateSnapshot['state'];
 
   private towerActorsMap = new Map<string, TowerActor>();
@@ -23,20 +26,26 @@ export class BattleScene extends Scene {
   private playerActorsMap = new Map<string, PlayerActor>();
 
   override onInitialize(): void {
-    const session = new GameSession(SESSION_BLUEPRINT);
+    this.session = new GameSession(SESSION_BLUEPRINT);
     this.setupCamera();
-    this.setupMap(session.getInitialState().board);
-    session.subscribe(({ state }) => {
+    this.setupMap(this.session.getInitialState().board);
+    this.session.subscribe(({ state }) => {
       this.gameState = state;
       this.updateActors();
     });
 
-    this.input.pointers.on('up', () => {
-      session.dispatch({ type: 'test', payload: { playerId: this.myPlayer.id } });
-    });
-    session.start();
+    this.input.pointers.on('up', this.onPointerup.bind(this));
+    this.session.start();
   }
 
+  onPointerup(e: PointerEvent) {
+    const coords = toWorldVector(e.worldPos);
+
+    this.session.dispatch({
+      type: 'test',
+      payload: { playerId: this.myPlayer.id, x: coords.x, y: coords.y }
+    });
+  }
   // temporary method to get the players we're controlling
   get myPlayer() {
     return this.gameState.teams[0].players.find(p => p.id === 'player1')!;

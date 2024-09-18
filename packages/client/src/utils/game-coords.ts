@@ -19,3 +19,6 @@ export class GameCoords {
 
 export const toScreen = (val: number) => val * TILE_SIZE;
 export const toScreenVector = (vec: Point) => new Vector(vec.x, vec.y).scale(TILE_SIZE);
+export const toWorld = (val: number) => val / TILE_SIZE;
+export const toWorldVector = (vec: Point) =>
+  new Vector(vec.x, vec.y).scale(1 / TILE_SIZE);

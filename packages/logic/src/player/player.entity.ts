@@ -1,11 +1,18 @@
-import { type Point, type Serializable, Vec2 } from '@game/shared';
+import {
+  type Point,
+  pointRectCollision,
+  type Rectangle,
+  type Serializable,
+  type StrictOmit,
+  Vec2
+} from '@game/shared';
 import { GameSession } from '../game-session';
 import { Tower, type SerializedTower } from '../tower/tower.entity';
 import { Team } from '../team/team.entity';
 import { Entity } from '../entity';
 import { config } from '../config';
 import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system.entity';
-import type { SerializedUnit, Unit } from '../unit/unit.entity';
+import { type SerializedUnit, Unit, type UnitBlueprint } from '../unit/unit.entity';
 
 export type PlayerId = string;
 
@@ -39,6 +46,8 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
 
   readonly units: Set<Unit> = new Set();
 
+  private nextUnitId = 0;
+
   readonly manaSystem: ManaSystem;
 
   constructor(session: GameSession, blueprint: PlayerBlueprint, team: Team) {
@@ -54,6 +63,12 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
 
   update(delta: number) {
     this.manaSystem.update(delta);
+    this.towers.forEach(tower => {
+      tower.update(delta);
+    });
+    this.units.forEach(unit => {
+      unit.update(delta);
+    });
   }
 
   equals(player: Player) {
@@ -61,7 +76,7 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
   }
 
   opponents() {
-    return this.session.teams.find(team => !team.equals(this.team))!.players;
+    return [...this.session.teams.find(team => !team.equals(this.team))!.players];
   }
 
   addInnerTower(x: number, y: number) {
@@ -98,6 +113,22 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
     this.towers.add(tower);
 
     return tower;
+  }
+
+  deployUnit(blueprint: StrictOmit<UnitBlueprint, 'id'>, position: Point) {
+    const isWithinDeployZone = pointRectCollision(position, this.team.deployZone);
+    if (!isWithinDeployZone) return;
+
+    this.units.add(
+      new Unit({
+        position: Vec2.from(position),
+        blueprint: {
+          ...blueprint,
+          id: `${this.id}_u_${++this.nextUnitId}`
+        },
+        player: this
+      })
+    );
   }
 
   serialize() {

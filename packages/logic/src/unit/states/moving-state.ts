@@ -13,7 +13,6 @@ export class UnitMovingState implements State<Unit> {
     this.seek(unit);
     if (!this.target) return;
     const distance = unit.position().dist(this.target.position());
-
     if (distance <= unit.attackRange()) {
       unit.startAttacking();
     } else {
@@ -29,17 +28,17 @@ export class UnitMovingState implements State<Unit> {
   private seek(unit: Unit) {
     if (this.target) return;
 
-    // let closestDistance = Infinity;
-    // let closestTarget: Tower | Unit = null;
+    let closestDistance = Infinity;
+    let closestTarget: Tower | Unit | null = null;
 
-    // unit.enemyTowers.forEach(target => {
-    //   const distance = unit.pos.distance(target.pos);
-    //   if (distance >= closestDistance) return;
+    unit.enemies().forEach(target => {
+      const distance = unit.position().dist(target.position());
+      if (distance >= closestDistance) return;
 
-    //   closestDistance = distance;
-    //   closestTarget = target;
-    // });
+      closestDistance = distance;
+      closestTarget = target;
+    });
 
-    // this.target = closestTarget;
+    this.target = closestTarget;
   }
 }

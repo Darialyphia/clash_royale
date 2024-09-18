@@ -56,6 +56,11 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
 
   private health: number;
 
+  private interceptors = {
+    attack: new Interceptable<number, Tower>(),
+    attackRange: new Interceptable<number, Tower>()
+  };
+
   constructor({
     position,
     blueprint,
@@ -75,10 +80,18 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
       .build(this, TOWER_STATES.IDLE);
   }
 
-  private interceptors = {
-    attack: new Interceptable<number, Tower>(),
-    attackRange: new Interceptable<number, Tower>()
-  };
+  serialize() {
+    return {
+      id: this.id,
+      playerId: this.player.id,
+      body: this.bbox.serialize(),
+      width: this.bbox.width,
+      height: this.bbox.height,
+      health: { current: this.health, max: this.maxHealth() },
+      attackRange: this.attackRange(),
+      state: this.stateMachine.state()
+    };
+  }
 
   position() {
     return Vec2.from(this.bbox);
@@ -118,18 +131,5 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     interceptor: inferInterceptor<TowerInterceptor[T]>
   ) {
     this.interceptors[key].remove(interceptor as any);
-  }
-
-  serialize() {
-    return {
-      id: this.id,
-      playerId: this.player.id,
-      body: this.bbox.serialize(),
-      width: this.bbox.width,
-      height: this.bbox.height,
-      health: { current: this.health, max: this.maxHealth() },
-      attackRange: this.attackRange(),
-      state: this.stateMachine.state()
-    };
   }
 }

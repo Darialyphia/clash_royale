@@ -1,4 +1,5 @@
 import type { Point, Radians, Serializable } from '../types';
+import { isNumber } from './assertions';
 
 export class Vec2 implements Serializable {
   static from(pt: Point) {
@@ -63,9 +64,14 @@ export class Vec2 implements Serializable {
     return this;
   }
 
-  scale({ x, y }: Point) {
-    this.x *= x;
-    this.y *= y;
+  public scale(pointOrNumber: number | Point) {
+    if (isNumber(pointOrNumber)) {
+      this.x *= pointOrNumber;
+      this.y *= pointOrNumber;
+    } else {
+      this.x *= pointOrNumber.x;
+      this.y *= pointOrNumber.y;
+    }
 
     return this;
   }

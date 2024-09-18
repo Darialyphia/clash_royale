@@ -6,8 +6,18 @@ export {
 } from './game-session';
 export type { SerializedPlayer, PlayerBlueprint } from './player/player.entity';
 export type { SerializedTeam, TeamBlueprint } from './team/team.entity';
-export type { SerializedTower, TowerBlueprint } from './tower/tower.entity';
-export type { SerializedUnit, UnitBlueprint } from './unit/unit.entity';
+export {
+  TOWER_STATES,
+  type TowerState,
+  type SerializedTower,
+  type TowerBlueprint
+} from './tower/tower.entity';
+export {
+  UNIT_STATES,
+  type UnitState,
+  type SerializedUnit,
+  type UnitBlueprint
+} from './unit/unit.entity';
 export type {
   BoardBlueprint,
   BoardCellBlueprint,

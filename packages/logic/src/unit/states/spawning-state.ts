@@ -13,7 +13,7 @@ export class UnitSpawningState implements State<Unit> {
 
     this.spawnCountdown -= delta;
     if (this.spawnCountdown <= 0) {
-      // unit.startMoving();
+      unit.startMoving();
     }
   }
 }
