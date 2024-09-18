@@ -4,6 +4,7 @@ import { toScreen, toScreenVector } from '@/utils/game-coords';
 import { resources } from '@/resources';
 
 import { SerializedTower } from '@game/logic';
+import { TowerHealthBar } from './tower-health-bar';
 
 export class TowerActor extends Actor {
   attackRange: number;
@@ -11,6 +12,8 @@ export class TowerActor extends Actor {
   maxHealth: number;
 
   health: number;
+
+  private readonly healthBar: TowerHealthBar;
 
   constructor(blueprint: SerializedTower) {
     const { x, y } = toScreenVector(blueprint.body);
@@ -26,7 +29,9 @@ export class TowerActor extends Actor {
     this.maxHealth = blueprint.health.max;
     this.health = blueprint.health.current;
 
+    this.healthBar = new TowerHealthBar(blueprint);
     this.addSprite();
+    this.addChild(this.healthBar);
     if (DEBUG) {
       this.debug();
     }
@@ -36,10 +41,12 @@ export class TowerActor extends Actor {
     this.health = newTower.health.current;
     this.maxHealth = newTower.health.max;
     this.attackRange = toScreen(newTower.attackRange);
+
+    this.healthBar.onStateUpdate(newTower);
   }
 
   addSprite() {
-    const graphics = resources.towersheet.getAnimation('idle')!;
+    const graphics = resources.towerSheet.getAnimation('idle')!;
     const sprite = new Actor({
       x: (this.width - graphics.width) / 2,
       y: (this.height - graphics.height) / 2
