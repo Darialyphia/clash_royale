@@ -4,10 +4,16 @@ import { AsepriteResource } from '@excaliburjs/plugin-aseprite';
 
 import mapSheetPath from './assets/tilemap.png?url';
 import towerSheetPath from './assets/tower.aseprite?url';
+import towerHealthBarPath from './assets/tower_health_bar.aseprite?url';
+import heartPath from './assets/heart.aseprite?url';
+import knightPath from './assets/knight.aseprite?url';
 
 export const resources = {
   mapSheet: new ImageSource(mapSheetPath),
-  towersheet: new AsepriteResource(towerSheetPath)
+  towerSheet: new AsepriteResource(towerSheetPath),
+  towerHealthBarSheet: new AsepriteResource(towerHealthBarPath),
+  heartSheet: new AsepriteResource(heartPath),
+  knightSheet: new AsepriteResource(knightPath)
 } as const;
 
 export const loader = new Loader();
@@ -23,6 +29,6 @@ export const mapSheet = SpriteSheet.fromImageSource({
   }
 });
 
-for (let res of Object.values(resources)) {
+for (const res of Object.values(resources)) {
   loader.addResource(res);
 }

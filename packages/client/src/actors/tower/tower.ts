@@ -1,9 +1,10 @@
 import { DEBUG, TILE_SIZE } from '@/constants';
-import { Actor, Circle, Color, Rectangle } from 'excalibur';
+import { Actor, Circle, Color, GraphicsGroup, Rectangle, Vector } from 'excalibur';
 import { toScreen, toScreenVector } from '@/utils/game-coords';
 import { resources } from '@/resources';
 
 import { SerializedTower } from '@game/logic';
+import { TowerHealthBar } from './tower-health-bar';
 
 export class TowerActor extends Actor {
   attackRange: number;
@@ -11,6 +12,10 @@ export class TowerActor extends Actor {
   maxHealth: number;
 
   health: number;
+
+  spritesheet = resources.towerSheet;
+
+  private readonly healthBar: TowerHealthBar;
 
   constructor(blueprint: SerializedTower) {
     const { x, y } = toScreenVector(blueprint.body);
@@ -26,36 +31,34 @@ export class TowerActor extends Actor {
     this.maxHealth = blueprint.health.max;
     this.health = blueprint.health.current;
 
-    this.addSprite();
+    this.healthBar = new TowerHealthBar(blueprint);
+
+    this.graphics.use(resources.towerSheet.getAnimation('idle')!);
+
+    this.addChild(this.healthBar);
     if (DEBUG) {
       this.debug();
     }
+  }
+
+  onPreUpdate(): void {
+    this.z = Math.round(this.pos.y);
   }
 
   onStateUpdate(newTower: SerializedTower) {
     this.health = newTower.health.current;
     this.maxHealth = newTower.health.max;
     this.attackRange = toScreen(newTower.attackRange);
-  }
 
-  addSprite() {
-    const graphics = resources.towersheet.getAnimation('idle')!;
-    const sprite = new Actor({
-      x: (this.width - graphics.width) / 2,
-      y: (this.height - graphics.height) / 2
-    });
-
-    sprite.graphics.use(graphics);
-    this.addChild(sprite);
+    this.healthBar.onStateUpdate(newTower);
   }
 
   debugAttackRange() {
     const color = Color.Red.clone();
-    color.a = 0.15;
+    color.a = 0.25;
 
     const circle = new Circle({
       color,
-      strokeColor: Color.Red,
       radius: this.attackRange / 2
     });
 
