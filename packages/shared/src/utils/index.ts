@@ -5,3 +5,4 @@ export * from './constants';
 export * from './geometry';
 export * from './vector';
 export * from './collisions';
+export * from './bbox';

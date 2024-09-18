@@ -1,6 +1,6 @@
-import { DEBUG, TILE_SIZE, TOWER_HEIGHT, TOWER_WIDTH } from '@/constants';
-import { Actor, Circle, Color, Rectangle, Vector } from 'excalibur';
-import { GameCoords, toScreen } from '@/utils/game-coords';
+import { DEBUG, TILE_SIZE } from '@/constants';
+import { Actor, Circle, Color, Rectangle } from 'excalibur';
+import { toScreen, toScreenVector } from '@/utils/game-coords';
 import { resources } from '@/resources';
 
 import { SerializedTower } from '@game/logic';
@@ -13,22 +13,18 @@ export class TowerActor extends Actor {
   health: number;
 
   constructor(blueprint: SerializedTower) {
-    const { x, y } = new GameCoords(
-      blueprint.position.x,
-      blueprint.position.y
-    ).toScreenCoords();
+    const { x, y } = toScreenVector(blueprint.body);
 
     super({
       x,
       y,
-      width: TOWER_WIDTH * TILE_SIZE,
-      height: TOWER_HEIGHT * TILE_SIZE,
+      width: toScreen(blueprint.body.width),
+      height: toScreen(blueprint.body.height),
       color: Color.DarkGray
     });
-
     this.attackRange = toScreen(blueprint.attackRange);
-    this.maxHealth = blueprint.maxHealth;
-    this.health = blueprint.health;
+    this.maxHealth = blueprint.health.max;
+    this.health = blueprint.health.current;
 
     this.addSprite();
     if (DEBUG) {
@@ -37,8 +33,8 @@ export class TowerActor extends Actor {
   }
 
   onStateUpdate(newTower: SerializedTower) {
-    this.health = newTower.health;
-    this.maxHealth = newTower.maxHealth;
+    this.health = newTower.health.current;
+    this.maxHealth = newTower.health.max;
     this.attackRange = toScreen(newTower.attackRange);
   }
 

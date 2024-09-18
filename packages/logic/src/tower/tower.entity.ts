@@ -1,4 +1,11 @@
-import { type Point, type Serializable, type Values, Vec2 } from '@game/shared';
+import {
+  Bbox,
+  type Point,
+  type Rectangle,
+  type Serializable,
+  type Values,
+  Vec2
+} from '@game/shared';
 import { Entity } from '../entity';
 import type { StateMachine } from '../utils/state-machine';
 import type { Player } from '../player/player.entity';
@@ -14,6 +21,8 @@ export type TowerBlueprint = {
   attack: number;
   attackRange: number;
   health: number;
+  width: number;
+  height: number;
 };
 
 /**
@@ -21,10 +30,9 @@ export type TowerBlueprint = {
  */
 export type SerializedTower = {
   id: string;
-  position: Point;
-  maxHealth: number;
-  health: number;
   playerId: string;
+  body: Rectangle; // body origin is its center, not top left
+  health: { current: number; max: number };
   attackRange: number;
   state: TowerState;
 };
@@ -42,7 +50,7 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
 
   private readonly blueprint: TowerBlueprint;
 
-  private pos: Vec2;
+  private bbox: Bbox;
 
   readonly player: Player;
 
@@ -60,7 +68,7 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     super(blueprint.id);
     this.player = player;
     this.blueprint = blueprint;
-    this.pos = position;
+    this.bbox = new Bbox(position, blueprint.width, blueprint.height);
     this.health = this.blueprint.health;
     this.stateMachine = new StateMachineBuilder<Tower>()
       .add(TOWER_STATES.IDLE, new TowerIdleState())
@@ -73,7 +81,7 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
   };
 
   position() {
-    return Vec2.from(this.pos);
+    return Vec2.from(this.bbox);
   }
 
   attack(): number {
@@ -116,9 +124,10 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     return {
       id: this.id,
       playerId: this.player.id,
-      position: this.pos,
-      health: this.health,
-      maxHealth: this.maxHealth(),
+      body: this.bbox.serialize(),
+      width: this.bbox.width,
+      height: this.bbox.height,
+      health: { current: this.health, max: this.maxHealth() },
       attackRange: this.attackRange(),
       state: this.stateMachine.state()
     };

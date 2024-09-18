@@ -8,6 +8,7 @@ import type { SerializedTower } from './tower/tower.entity';
 import type { SerializedUnit } from './unit/unit.entity';
 import { InputSystem } from './input/input-system';
 import type { SerializedInput } from './input/input';
+import type { PlayerBlueprint } from './player/player.entity';
 
 export type SerializedGameStateSnapshot = {
   state: {

@@ -1,7 +1,9 @@
 import {
+  Bbox,
   Vec2,
   type Milliseconds,
   type Point,
+  type Rectangle,
   type Serializable,
   type Values
 } from '@game/shared';
@@ -26,6 +28,8 @@ export type UnitBlueprint = {
   health: number;
   spawnTime: Milliseconds;
   speed: number;
+  width: number;
+  height: number;
 };
 
 /**
@@ -34,14 +38,15 @@ export type UnitBlueprint = {
 export type SerializedUnit = {
   id: string;
   playerId: string;
-  maxHealth: number;
-  health: number;
-  speed: number;
+  health: { current: number; max: number };
   attackRange: number;
   aggroRange: number;
-  position: Point;
-  velocity: Point;
+  body: Rectangle; // body origin is its center, not top left
   state: UnitState;
+  // Note: going to experient letting excalibur do the heavy lifting client site interpolation wise.
+  // If it doesnt work out, we can remove those 2 properties
+  velocity: Point;
+  speed: number;
 };
 
 export const UNIT_STATES = {
@@ -63,7 +68,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   private health: number;
 
-  private pos: Vec2;
+  private bbox: Bbox;
 
   private vel: Vec2;
 
@@ -79,7 +84,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     super(blueprint.id);
     this.player = player;
     this.blueprint = blueprint;
-    this.pos = position;
+    this.bbox = new Bbox(position, blueprint.width, blueprint.height);
     this.vel = new Vec2(0, 0);
     this.health = this.blueprint.health;
     this.stateMachine = new StateMachineBuilder<Unit>()
@@ -100,7 +105,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
   }
 
   position() {
-    return Vec2.from(this.pos);
+    return Vec2.from(this.bbox);
   }
 
   velocity() {
@@ -171,14 +176,13 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     return {
       id: this.id,
       playerId: this.player.id,
-      health: this.health,
-      maxHealth: this.maxHealth(),
+      state: this.stateMachine.state(),
+      health: { current: this.health, max: this.maxHealth() },
       attackRange: this.attackRange(),
       aggroRange: this.aggroRange(),
-      position: this.pos.serialize(),
+      body: this.bbox.serialize(),
       velocity: this.vel.serialize(),
-      speed: this.speed(),
-      state: this.stateMachine.state()
+      speed: this.speed()
     };
   }
 }

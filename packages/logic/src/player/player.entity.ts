@@ -71,7 +71,9 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
         id: this.id + '_ti',
         attack: config.INNER_TOWER_ATTACK,
         health: config.INNER_TOWER_HEALTH,
-        attackRange: config.INNER_TOWER_RANGE
+        attackRange: config.INNER_TOWER_RANGE,
+        width: config.TOWER_WIDTH,
+        height: config.TOWER_HEIGHT
       },
       player: this
     });
@@ -87,7 +89,9 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
         id: this.id + `_to_${this.towers.size + 1}`,
         attack: config.OUTER_TOWER_ATTACK,
         health: config.OUTER_TOWER_HEALTH,
-        attackRange: config.OUTER_TOWER_RANGE
+        attackRange: config.OUTER_TOWER_RANGE,
+        width: config.TOWER_WIDTH,
+        height: config.TOWER_HEIGHT
       },
       player: this
     });
