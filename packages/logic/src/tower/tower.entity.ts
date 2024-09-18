@@ -26,9 +26,10 @@ export type SerializedTower = {
   health: number;
   playerId: string;
   attackRange: number;
+  state: TowerState;
 };
 
-const TOWER_STATES = {
+export const TOWER_STATES = {
   IDLE: 'idle'
 } as const;
 
@@ -118,7 +119,8 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
       position: this.pos,
       health: this.health,
       maxHealth: this.maxHealth(),
-      attackRange: this.attackRange()
+      attackRange: this.attackRange(),
+      state: this.stateMachine.state()
     };
   }
 }

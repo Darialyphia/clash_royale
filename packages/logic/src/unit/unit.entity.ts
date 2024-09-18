@@ -41,9 +41,10 @@ export type SerializedUnit = {
   aggroRange: number;
   position: Point;
   velocity: Point;
+  state: UnitState;
 };
 
-const UNIT_STATES = {
+export const UNIT_STATES = {
   SPAWNING: 'spawning',
   MOVING: 'moving',
   ATTACKING: 'attacking'
@@ -176,7 +177,8 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       aggroRange: this.aggroRange(),
       position: this.pos.serialize(),
       velocity: this.vel.serialize(),
-      speed: this.speed()
+      speed: this.speed(),
+      state: this.stateMachine.state()
     };
   }
 }

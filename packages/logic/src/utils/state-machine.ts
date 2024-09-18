@@ -41,6 +41,10 @@ export class StateMachine<TContext, TStates extends string> {
     return this.states.get(name)!;
   }
 
+  state() {
+    return this.currentState;
+  }
+
   update(delta: number) {
     this.getState(this.currentState).onUpdate?.(this.ctx, delta);
   }
