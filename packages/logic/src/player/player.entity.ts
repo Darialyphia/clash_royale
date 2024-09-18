@@ -1,7 +1,6 @@
 import {
   type Point,
   pointRectCollision,
-  type Rectangle,
   type Serializable,
   type StrictOmit,
   Vec2
@@ -13,6 +12,8 @@ import { Entity } from '../entity';
 import { config } from '../config';
 import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system.entity';
 import { type SerializedUnit, Unit, type UnitBlueprint } from '../unit/unit.entity';
+import { Deck, type DeckBlueprint, DeckSystem, type SerializedDeckSystem } from '../cards/cards';
+import * as console from 'node:console';
 
 export type PlayerId = string;
 
@@ -24,6 +25,7 @@ export type PlayerBlueprint = {
   innerTower: Point;
   outerTowers: Point[];
   manaSystem: ManaSystemBlueprint;
+  deck: DeckBlueprint;
 };
 
 /**
@@ -35,6 +37,7 @@ export type SerializedPlayer = {
   maxMana: number;
   towers: SerializedTower[];
   units: SerializedUnit[];
+  deckSystem: SerializedDeckSystem
 };
 
 export class Player extends Entity implements Serializable<SerializedPlayer> {
@@ -50,6 +53,8 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
 
   readonly manaSystem: ManaSystem;
 
+  readonly deckSystem: DeckSystem;
+
   constructor(session: GameSession, blueprint: PlayerBlueprint, team: Team) {
     super(blueprint.id);
     this.team = team;
@@ -59,10 +64,17 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       this.addOuterTower(x, y);
     });
     this.manaSystem = new ManaSystem(blueprint.manaSystem);
+    this.deckSystem = new DeckSystem({ id: `${this.id}_deck`, deck: new Deck(blueprint.deck)});
+
+    // :(
+    // this.deckSystem.subscribeBeforePlay((p, c, t) => console.log(`BEFORE: ${p.id} is playing ${c.id} at ${t}`))
+    // this.deckSystem.subscribeOnPlay((p, c, t) => console.log(`ON: ${p.id} is playing ${c.id} at ${t}`))
+    // this.deckSystem.subscribeAfterPlay((p, c, t) => console.log(`AFTER: ${p.id} is playing ${c.id} at ${t}`))
   }
 
   update(delta: number) {
     this.manaSystem.update(delta);
+    this.deckSystem.update(delta);
     this.towers.forEach(tower => {
       tower.update(delta);
     });
@@ -137,7 +149,8 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       currentMana: this.manaSystem.current(),
       maxMana: this.manaSystem.capacity(),
       towers: [...this.towers].map(tower => tower.serialize()),
-      units: [...this.units].map(unit => unit.serialize())
+      units: [...this.units].map(unit => unit.serialize()),
+      deckSystem: this.deckSystem.serialize(),
     };
   }
 }

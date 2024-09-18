@@ -1,6 +1,5 @@
 import {
   Bbox,
-  type Point,
   type Rectangle,
   type Serializable,
   type Values,

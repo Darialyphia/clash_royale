@@ -1,12 +1,11 @@
 import type { Constructor, Values } from '@game/shared';
 import {
-  defaultInputSchema,
   type DefaultSchema,
   Input,
   type SerializedInput
 } from './input';
 import type { GameSession } from '../game-session';
-import { TestInput } from './inputs/test.input';
+import { CardTestInput, TestInput } from './inputs/test.input';
 
 type GenericInputMap = Record<string, Constructor<Input<DefaultSchema>>>;
 
@@ -22,7 +21,8 @@ const validateActionMap = <T extends GenericInputMap>(data: ValidatedActionMap<T
   data;
 
 const inputMap = validateActionMap({
-  test: TestInput
+  test: TestInput,
+  'card-test': CardTestInput,
 });
 
 export class InputSystem {

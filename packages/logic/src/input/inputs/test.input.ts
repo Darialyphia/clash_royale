@@ -12,7 +12,7 @@ export class TestInput extends Input<typeof schema> {
 
   protected payloadSchema = schema;
 
-  impl(session: GameSession, player: Player) {
+  impl(_session: GameSession, player: Player) {
     player.deployUnit(
       {
         aggroRange: 2,
@@ -26,5 +26,18 @@ export class TestInput extends Input<typeof schema> {
       },
       this.payload
     );
+  }
+}
+
+const cardSchema = defaultInputSchema.extend({
+  card2play: z.literal(0).or(z.literal(1)).or(z.literal(2)).or(z.literal(3)),
+});
+export class CardTestInput extends Input<typeof cardSchema> {
+  readonly name = 'card-test';
+
+  protected payloadSchema = cardSchema;
+
+  impl(_session: GameSession, player: Player) {
+    player.deckSystem.tryPlay(player, "PlayerBoard", this.payload.card2play);
   }
 }

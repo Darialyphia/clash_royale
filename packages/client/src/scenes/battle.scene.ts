@@ -1,4 +1,4 @@
-import { Engine, Scene, TileMap, Vector, type PointerEvent } from 'excalibur';
+import { Engine, Scene, TileMap, Vector, type PointerEvent, KeyEvent, Keys } from 'excalibur';
 import { HEIGHT, MAP_COLS, MAP_ROWS, SESSION_BLUEPRINT, WIDTH } from '../constants';
 import { mapSheet } from '../resources';
 import { PlayerActor } from '@/actors/player/player';
@@ -13,6 +13,7 @@ import {
 import { TowerActor } from '@/actors/tower/tower';
 import { UnitActor } from '@/actors/unit/unit';
 import { toWorldVector } from '@/utils/game-coords';
+import { HandCard } from '@game/logic/src/cards/cards.ts';
 
 export class BattleScene extends Scene {
   private session!: GameSession;
@@ -35,6 +36,7 @@ export class BattleScene extends Scene {
     });
 
     this.input.pointers.on('up', this.onPointerup.bind(this));
+    this.input.keyboard.on('press', this.onKeyPress.bind(this));
     this.session.start();
   }
 
@@ -46,6 +48,33 @@ export class BattleScene extends Scene {
       payload: { playerId: this.myPlayer.id, x: coords.x, y: coords.y }
     });
   }
+
+  onKeyPress(e: KeyEvent) {
+    let card = -1;
+    switch (e.key) {
+      case Keys.Key0:
+        card = 0;
+        break;
+      case Keys.Key1:
+        card = 1;
+        break;
+      case Keys.Key2:
+        card = 2;
+        break;
+      case Keys.Key3:
+        card = 3;
+        break;
+    }
+
+
+    if (card === -1) return;
+    let card2play = card as HandCard;
+    this.session.dispatch({
+      type: 'card-test',
+      payload: { playerId: this.myPlayer.id, card2play }
+    });
+  }
+
   // temporary method to get the players we're controlling
   get myPlayer() {
     return this.gameState.teams[0].players.find(p => p.id === 'player1')!;
