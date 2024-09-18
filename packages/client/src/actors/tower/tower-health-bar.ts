@@ -1,4 +1,4 @@
-import { TILE_SIZE } from '@/constants';
+import { TILE_SIZE, Z_INDICES } from '@/constants';
 import { resources } from '@/resources';
 import { SerializedTower } from '@game/logic';
 import {
@@ -16,7 +16,7 @@ export class TowerHealthBar extends Actor {
   private readonly text: Label;
 
   constructor(tower: SerializedTower) {
-    super({ y: -TILE_SIZE });
+    super({ y: -TILE_SIZE, z: Z_INDICES.UI });
     this.graphics.use(
       new GraphicsGroup({
         members: [

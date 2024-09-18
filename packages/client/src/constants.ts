@@ -97,3 +97,7 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
     }
   ]
 };
+
+export const Z_INDICES = {
+  UI: 999
+};

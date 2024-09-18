@@ -25,8 +25,6 @@ export class UnitActor extends Actor {
 
   aggroRange: number;
 
-  sprite = new Actor();
-
   spritesheet = resources.knightSheet;
 
   state: UnitState;
@@ -48,13 +46,15 @@ export class UnitActor extends Actor {
     this.attackRange = blueprint.attackRange;
     this.aggroRange = blueprint.aggroRange;
 
-    const graphics = this.spritesheet.getAnimation(unitAnimation[blueprint.state])!;
-    this.sprite.graphics.use(graphics);
-    this.addChild(this.sprite);
+    this.graphics.use(this.spritesheet.getAnimation(unitAnimation[blueprint.state])!);
 
     if (DEBUG) {
       this.debug();
     }
+  }
+
+  onPreUpdate(): void {
+    this.z = Math.round(this.pos.y);
   }
 
   onStateUpdate(newUnit: SerializedUnit) {
@@ -65,7 +65,7 @@ export class UnitActor extends Actor {
     this.color = unitColors[newUnit.state];
     if (this.state !== newUnit.state) {
       const graphics = this.spritesheet.getAnimation(unitAnimation[newUnit.state])!;
-      this.sprite.graphics.use(graphics);
+      this.graphics.use(graphics);
       this.state = newUnit.state;
     }
 
@@ -82,11 +82,10 @@ export class UnitActor extends Actor {
 
   debugAttackRange() {
     const color = Color.Red;
-    color.a = 0.15;
+    color.a = 0.25;
 
     const circle = new Circle({
       color,
-      strokeColor: Color.Red,
       radius: (this.attackRange * TILE_SIZE) / 2
     });
 
@@ -99,12 +98,11 @@ export class UnitActor extends Actor {
   }
 
   debugAggroRange() {
-    const color = Color.Orange;
-    color.a = 0.15;
+    const color = Color.Azure;
+    color.a = 0.25;
 
     const circle = new Circle({
       color,
-      strokeColor: Color.Red,
       radius: (this.aggroRange * TILE_SIZE) / 2
     });
 
