@@ -17,6 +17,7 @@ export class TestInput extends Input<typeof schema> {
       {
         aggroRange: 2,
         attackRange: 1,
+        attackSpeed: 1.4,
         attack: 10,
         health: 50,
         height: 0.5,
@@ -30,7 +31,7 @@ export class TestInput extends Input<typeof schema> {
 }
 
 const cardSchema = defaultInputSchema.extend({
-  card2play: z.literal(0).or(z.literal(1)).or(z.literal(2)).or(z.literal(3)),
+  card2play: z.literal(0).or(z.literal(1)).or(z.literal(2)).or(z.literal(3))
 });
 export class CardTestInput extends Input<typeof cardSchema> {
   readonly name = 'card-test';
@@ -38,6 +39,6 @@ export class CardTestInput extends Input<typeof cardSchema> {
   protected payloadSchema = cardSchema;
 
   impl(_session: GameSession, player: Player) {
-    player.deckSystem.tryPlay(player, "PlayerBoard", this.payload.card2play);
+    player.deckSystem.tryPlay(player, 'PlayerBoard', this.payload.card2play);
   }
 }

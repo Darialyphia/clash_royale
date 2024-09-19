@@ -1,10 +1,4 @@
-import {
-  Bbox,
-  type Rectangle,
-  type Serializable,
-  type Values,
-  Vec2
-} from '@game/shared';
+import { Bbox, type Rectangle, type Serializable, type Values, Vec2 } from '@game/shared';
 import { Entity } from '../entity';
 import type { StateMachine } from '../utils/state-machine';
 import type { Player } from '../player/player.entity';
@@ -49,7 +43,7 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
 
   private readonly blueprint: TowerBlueprint;
 
-  private bbox: Bbox;
+  private _bbox: Bbox;
 
   readonly player: Player;
 
@@ -72,7 +66,7 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     super(blueprint.id);
     this.player = player;
     this.blueprint = blueprint;
-    this.bbox = new Bbox(position, blueprint.width, blueprint.height);
+    this._bbox = new Bbox(position, blueprint.width, blueprint.height);
     this.health = this.blueprint.health;
     this.stateMachine = new StateMachineBuilder<Tower>()
       .add(TOWER_STATES.IDLE, new TowerIdleState())
@@ -83,17 +77,21 @@ export class Tower extends Entity implements Serializable<SerializedTower> {
     return {
       id: this.id,
       playerId: this.player.id,
-      body: this.bbox.serialize(),
-      width: this.bbox.width,
-      height: this.bbox.height,
+      body: this._bbox.serialize(),
+      width: this._bbox.width,
+      height: this._bbox.height,
       health: { current: this.health, max: this.maxHealth() },
       attackRange: this.attackRange(),
       state: this.stateMachine.state()
     };
   }
 
+  bbox() {
+    return this._bbox.clone();
+  }
+
   position() {
-    return Vec2.from(this.bbox);
+    return Vec2.from(this._bbox);
   }
 
   attack(): number {

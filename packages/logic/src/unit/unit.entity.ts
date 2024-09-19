@@ -15,6 +15,7 @@ import { Interceptable, type inferInterceptor } from '../utils/interceptable';
 import { UnitSpawningState } from './states/spawning-state';
 import { UnitMovingState } from './states/moving-state';
 import { UnitAttackingState } from './states/attacking-state';
+import type { Tower } from '../tower/tower.entity';
 
 /**
  * The shape of the input used to create a tower
@@ -23,6 +24,7 @@ export type UnitBlueprint = {
   id: string;
   attack: number;
   attackRange: number;
+  attackSpeed: number; // attacks per second
   aggroRange: number;
   health: number;
   spawnTime: Milliseconds;
@@ -65,16 +67,19 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   readonly player: Player;
 
+  target: Unit | Tower | null = null;
+
   private health: number;
 
-  private bbox: Bbox;
+  private _bbox: Bbox;
 
   private vel: Vec2;
 
   private interceptors = {
     attack: new Interceptable<number, Unit>(),
     speed: new Interceptable<number, Unit>(),
-    attackRange: new Interceptable<number, Unit>()
+    attackRange: new Interceptable<number, Unit>(),
+    attackSpeed: new Interceptable<number, Unit>()
   };
 
   constructor({
@@ -89,7 +94,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     super(blueprint.id);
     this.player = player;
     this.blueprint = blueprint;
-    this.bbox = new Bbox(position, blueprint.width, blueprint.height);
+    this._bbox = new Bbox(position, blueprint.width, blueprint.height);
     this.vel = new Vec2(0, 0);
     this.health = this.blueprint.health;
     this.stateMachine = new StateMachineBuilder<Unit>()
@@ -107,7 +112,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       health: { current: this.health, max: this.maxHealth() },
       attackRange: this.attackRange(),
       aggroRange: this.aggroRange(),
-      body: this.bbox.serialize(),
+      body: this._bbox.serialize(),
       velocity: this.vel.serialize(),
       speed: this.speed()
     };
@@ -115,8 +120,8 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   update(delta: number) {
     this.stateMachine.update(delta);
-    this.bbox.moveTo(
-      Vec2.from(this.bbox).add(this.vel.normalize().scale((this.speed() * delta) / 1000))
+    this._bbox.moveTo(
+      Vec2.from(this._bbox).add(this.vel.normalize().scale((this.speed() * delta) / 1000))
     );
   }
 
@@ -124,12 +129,20 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     return this.blueprint.spawnTime;
   }
 
+  bbox() {
+    return this._bbox.clone();
+  }
+
   position() {
-    return Vec2.from(this.bbox);
+    return Vec2.from(this._bbox);
   }
 
   velocity() {
     return Vec2.from(this.vel);
+  }
+
+  currentTarget() {
+    return this.target;
   }
 
   speed() {
@@ -142,6 +155,24 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   aggroRange() {
     return this.blueprint.aggroRange;
+  }
+
+  attackSpeed() {
+    return this.interceptors.attackSpeed.getValue(this.blueprint.attackSpeed, this);
+  }
+
+  attackRadius() {
+    return {
+      ...this.position(),
+      radius: this.attackRange()
+    };
+  }
+
+  aggroRadius() {
+    return {
+      ...this.position(),
+      radius: this.aggroRange()
+    };
   }
 
   attackRange(): number {
@@ -163,6 +194,20 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       .flat();
   }
 
+  enemyUnits() {
+    return this.player
+      .opponents()
+      .map(player => [...player.units])
+      .flat();
+  }
+
+  enemyTowers() {
+    return this.player
+      .opponents()
+      .map(player => [...player.towers])
+      .flat();
+  }
+
   addInterceptor<T extends keyof UnitInterceptor>(
     key: T,
     interceptor: inferInterceptor<UnitInterceptor[T]>,
@@ -177,6 +222,14 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     interceptor: inferInterceptor<UnitInterceptor[T]>
   ) {
     this.interceptors[key].remove(interceptor as any);
+  }
+
+  canAttack(entity: Unit | Tower) {
+    return entity.bbox().intersectsCircle(this.attackRadius());
+  }
+
+  canAggro(entity: Unit) {
+    return entity.bbox().intersectsCircle(this.aggroRadius());
   }
 
   startMoving() {

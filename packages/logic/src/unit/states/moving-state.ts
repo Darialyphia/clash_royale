@@ -1,44 +1,41 @@
-import type { Tower } from '../../tower/tower.entity';
+import { Tower } from '../../tower/tower.entity';
 import type { State } from '../../utils/state-machine';
 import { Unit } from '../unit.entity';
 
 export class UnitMovingState implements State<Unit> {
-  target: Unit | Tower | null = null;
-
   onExit(unit: Unit) {
     unit.stopMoving();
   }
 
   onUpdate(unit: Unit) {
     this.seek(unit);
-    if (!this.target) return;
-    const distance = unit.position().dist(this.target.position());
+    if (!unit.target) return;
+    const distance = unit.position().dist(unit.target.position());
     if (distance <= unit.attackRange()) {
       unit.startAttacking();
     } else {
-      this.move(unit);
+      unit.moveTowards(unit.target.position().sub(unit.position()));
     }
   }
 
-  private move(unit: Unit) {
-    if (!this.target) return;
-    unit.moveTowards(this.target.position().sub(unit.position()));
-  }
-
   private seek(unit: Unit) {
-    if (this.target) return;
+    const [closestUnit] = unit
+      .enemyUnits()
+      .filter(enemy => unit.canAggro(enemy))
+      .sort((a, b) => {
+        return unit.position().dist(a.position()) - unit.position().dist(b.position());
+      });
 
-    let closestDistance = Infinity;
-    let closestTarget: Tower | Unit | null = null;
+    if (closestUnit) {
+      unit.target = closestUnit;
 
-    unit.enemies().forEach(target => {
-      const distance = unit.position().dist(target.position());
-      if (distance >= closestDistance) return;
-
-      closestDistance = distance;
-      closestTarget = target;
+      return;
+    }
+    const [closestTower] = unit.enemyTowers().sort((a, b) => {
+      return unit.position().dist(a.position()) - unit.position().dist(b.position());
     });
-
-    this.target = closestTarget;
+    if (closestTower) {
+      unit.target = closestTower;
+    }
   }
 }

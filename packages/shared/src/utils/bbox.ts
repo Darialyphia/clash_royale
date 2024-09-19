@@ -78,6 +78,10 @@ export class Bbox implements Serializable<Rectangle> {
     this.center = Vec2.from(point);
   }
 
+  clone() {
+    return new Bbox(this.center, this.width, this.height);
+  }
+
   collidesWith(other: Bbox): boolean {
     return !(
       this.xmax < other.xmin ||

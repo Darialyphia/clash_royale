@@ -11,6 +11,7 @@
     "@game/shared": "*",
     "eventemitter2": "^6.4.9",
     "nanoid": "^4.0.2",
+    "ts-pattern": "^5.3.1",
     "zod": "^3.21.4"
   },
   "scripts": {

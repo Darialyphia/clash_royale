@@ -48,6 +48,10 @@ export class BattleScene extends Scene {
     this.session.start();
   }
 
+  /**
+   * left click: spawn ally Unit
+   * right click: spawn enemy unit
+   */
   onPointerup(e: PointerEvent) {
     const coords = toWorldVector(e.worldPos);
     const player = e.button === 'Left' ? this.myPlayer : this.myOpponent;
