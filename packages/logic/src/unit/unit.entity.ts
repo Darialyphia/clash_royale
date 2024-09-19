@@ -44,6 +44,7 @@ export type SerializedUnit = {
   aggroRange: number;
   body: Rectangle; // body origin is its center, not top left
   state: UnitState;
+  orientation: 'left' | 'right';
   // Note: going to experient letting excalibur do the heavy lifting client site interpolation wise.
   // If it doesnt work out, we can remove those 2 properties
   velocity: Point;
@@ -55,8 +56,13 @@ export const UNIT_STATES = {
   MOVING: 'moving',
   ATTACKING: 'attacking'
 } as const;
-
 export type UnitState = Values<typeof UNIT_STATES>;
+
+export const UNIT_ORIENTATION = {
+  LEFT: 'left',
+  RIGHT: 'right'
+} as const;
+export type UnitOrientation = Values<typeof UNIT_ORIENTATION>;
 
 export type UnitInterceptor = Unit['interceptors'];
 
@@ -114,6 +120,10 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       aggroRange: this.aggroRange(),
       body: this._bbox.serialize(),
       velocity: this.vel.serialize(),
+      orientation:
+        this.target && this.target.position().x < this.position().x
+          ? UNIT_ORIENTATION.LEFT
+          : UNIT_ORIENTATION.RIGHT,
       speed: this.speed()
     };
   }

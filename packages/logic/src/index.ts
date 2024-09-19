@@ -14,7 +14,9 @@ export {
 } from './tower/tower.entity';
 export {
   UNIT_STATES,
+  UNIT_ORIENTATION,
   type UnitState,
+  type UnitOrientation,
   type SerializedUnit,
   type UnitBlueprint
 } from './unit/unit.entity';

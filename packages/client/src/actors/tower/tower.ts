@@ -1,4 +1,4 @@
-import { DEBUG, TILE_SIZE } from '@/constants';
+import { DEBUG, SHOW_SPRITES, TILE_SIZE } from '@/constants';
 import { Actor, Circle, Color, GraphicsGroup, Rectangle, Vector } from 'excalibur';
 import { toScreen, toScreenVector } from '@/utils/game-coords';
 import { resources } from '@/resources';
@@ -33,7 +33,9 @@ export class TowerActor extends Actor {
 
     this.healthBar = new TowerHealthBar(blueprint);
 
-    this.graphics.use(resources.towerSheet.getAnimation('idle')!);
+    if (SHOW_SPRITES) {
+      this.graphics.use(resources.towerSheet.getAnimation('idle')!);
+    }
 
     this.addChild(this.healthBar);
     if (DEBUG) {
@@ -59,7 +61,7 @@ export class TowerActor extends Actor {
 
     const circle = new Circle({
       color,
-      radius: this.attackRange / 2
+      radius: this.attackRange
     });
 
     const actor = new Actor({

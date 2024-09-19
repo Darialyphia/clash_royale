@@ -15,8 +15,8 @@ export class TestInput extends Input<typeof schema> {
   impl(_session: GameSession, player: Player) {
     player.deployUnit(
       {
-        aggroRange: 2,
-        attackRange: 1,
+        aggroRange: 1.5,
+        attackRange: 0.6,
         attackSpeed: 1.4,
         attack: 10,
         health: 50,

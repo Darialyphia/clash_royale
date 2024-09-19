@@ -1,7 +1,7 @@
 import { Actor, Circle, Color, Engine, Vector } from 'excalibur';
-import { DEBUG, TILE_SIZE } from '@/constants';
+import { DEBUG, SHOW_SPRITES, TILE_SIZE } from '@/constants';
 import { GameCoords, toScreen } from '@/utils/game-coords';
-import { SerializedUnit, UNIT_STATES, UnitState } from '@game/logic';
+import { SerializedUnit, UNIT_ORIENTATION, UNIT_STATES, UnitState } from '@game/logic';
 import { resources } from '@/resources';
 
 const unitColors: Record<UnitState, Color> = {
@@ -43,10 +43,12 @@ export class UnitActor extends Actor {
     this.state = blueprint.state;
     this.maxHealth = blueprint.health.max;
     this.health = blueprint.health.current;
-    this.attackRange = blueprint.attackRange;
-    this.aggroRange = blueprint.aggroRange;
+    this.attackRange = toScreen(blueprint.attackRange);
+    this.aggroRange = toScreen(blueprint.aggroRange);
 
-    this.graphics.use(this.spritesheet.getAnimation(unitAnimation[blueprint.state])!);
+    if (SHOW_SPRITES) {
+      this.graphics.use(this.spritesheet.getAnimation(unitAnimation[blueprint.state])!);
+    }
 
     if (DEBUG) {
       this.debug();
@@ -55,7 +57,6 @@ export class UnitActor extends Actor {
 
   onPreUpdate(): void {
     this.z = Math.round(this.pos.y);
-    this.graphics.flipHorizontal = this.vel.x < 0;
   }
 
   onStateUpdate(newUnit: SerializedUnit) {
@@ -64,10 +65,16 @@ export class UnitActor extends Actor {
     this.attackRange = toScreen(newUnit.attackRange);
     this.aggroRange = toScreen(newUnit.aggroRange);
     this.color = unitColors[newUnit.state];
+    this.graphics.flipHorizontal = newUnit.orientation === UNIT_ORIENTATION.LEFT;
+
     if (this.state !== newUnit.state) {
-      const graphics = this.spritesheet.getAnimation(unitAnimation[newUnit.state])!;
-      this.graphics.use(graphics);
-      this.state = newUnit.state;
+      if (SHOW_SPRITES) {
+        const graphics = this.spritesheet.getAnimation(unitAnimation[newUnit.state])!;
+        this.graphics.use(graphics);
+        this.state = newUnit.state;
+      } else {
+        this.color = unitColors[newUnit.state];
+      }
     }
 
     // There is a bug with Excalibur's Vector.normalize() that returns {0,1} when normalizing a vector with a mmagnitude of 0
@@ -87,7 +94,7 @@ export class UnitActor extends Actor {
 
     const circle = new Circle({
       color,
-      radius: (this.attackRange * TILE_SIZE) / 2
+      radius: this.attackRange
     });
 
     const actor = new Actor({
@@ -104,7 +111,7 @@ export class UnitActor extends Actor {
 
     const circle = new Circle({
       color,
-      radius: (this.aggroRange * TILE_SIZE) / 2
+      radius: this.aggroRange
     });
 
     const actor = new Actor({

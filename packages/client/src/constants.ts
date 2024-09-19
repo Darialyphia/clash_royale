@@ -3,6 +3,7 @@ import { mapRange } from '@game/shared';
 import { Color } from 'excalibur';
 
 export const DEBUG = true;
+export const SHOW_SPRITES = false;
 export const TILE_SIZE = 32;
 export const MAP_ROWS = 7;
 export const MAP_COLS = 11;

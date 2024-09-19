@@ -10,8 +10,7 @@ export class UnitMovingState implements State<Unit> {
   onUpdate(unit: Unit) {
     this.seek(unit);
     if (!unit.target) return;
-    const distance = unit.position().dist(unit.target.position());
-    if (distance <= unit.attackRange()) {
+    if (unit.canAttack(unit.target)) {
       unit.startAttacking();
     } else {
       unit.moveTowards(unit.target.position().sub(unit.position()));
@@ -19,6 +18,15 @@ export class UnitMovingState implements State<Unit> {
   }
 
   private seek(unit: Unit) {
+    const oldTarget = unit.target;
+
+    const [closestTower] = unit.enemyTowers().sort((a, b) => {
+      return unit.position().dist(a.position()) - unit.position().dist(b.position());
+    });
+    if (closestTower) {
+      unit.target = closestTower;
+    }
+
     const [closestUnit] = unit
       .enemyUnits()
       .filter(enemy => unit.canAggro(enemy))
@@ -28,14 +36,10 @@ export class UnitMovingState implements State<Unit> {
 
     if (closestUnit) {
       unit.target = closestUnit;
-
-      return;
     }
-    const [closestTower] = unit.enemyTowers().sort((a, b) => {
-      return unit.position().dist(a.position()) - unit.position().dist(b.position());
-    });
-    if (closestTower) {
-      unit.target = closestTower;
+
+    if (unit.target && unit.target !== oldTarget) {
+      console.log('switched target to', unit.target.id);
     }
   }
 }
