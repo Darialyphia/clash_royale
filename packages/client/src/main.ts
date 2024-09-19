@@ -1,6 +1,6 @@
 import './style.css';
 import { BG_COLOR, HEIGHT, WIDTH } from './constants';
-import { Engine, FadeInOut } from 'excalibur';
+import { DisplayMode, Engine, FadeInOut } from 'excalibur';
 import { loader } from './resources';
 import { BattleScene } from './scenes/battle.scene';
 
@@ -16,11 +16,17 @@ const game = new Engine({
   }
 });
 
-game.start('battle', {
-  inTransition: new FadeInOut({
-    direction: 'in',
-    color: BG_COLOR,
-    duration: 1000
-  }),
-  loader
-});
+game
+  .start('battle', {
+    inTransition: new FadeInOut({
+      direction: 'in',
+      color: BG_COLOR,
+      duration: 1000
+    }),
+    loader
+  })
+  .then(() => {
+    game.canvas.addEventListener('contextmenu', e => {
+      e.preventDefault();
+    });
+  });

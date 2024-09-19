@@ -23,7 +23,7 @@ export class TowerHealthBar extends Actor {
           resources.towerHealthBarSheet.getSpriteSheet()!.getSprite(0, 0)!,
           {
             graphic: resources.heartSheet.getSpriteSheet()!.getSprite(0, 0)!,
-            offset: new Vector(-4, -5),
+            offset: new Vector(-4, -6),
             useBounds: false
           }
         ]
@@ -32,8 +32,9 @@ export class TowerHealthBar extends Actor {
 
     this.text = new Label({
       text: `${tower.health.current.toFixed()}`,
-      x: -12,
-      y: -12,
+      x: -8,
+      y: -10,
+      z: Z_INDICES.UI,
       width: TILE_SIZE,
       font: new Font({
         family: 'impact',

@@ -1,4 +1,12 @@
-import { Engine, Scene, TileMap, Vector, type PointerEvent, KeyEvent, Keys } from 'excalibur';
+import {
+  Engine,
+  Scene,
+  TileMap,
+  Vector,
+  type PointerEvent,
+  KeyEvent,
+  Keys
+} from 'excalibur';
 import { HEIGHT, MAP_COLS, MAP_ROWS, SESSION_BLUEPRINT, WIDTH } from '../constants';
 import { mapSheet } from '../resources';
 import { PlayerActor } from '@/actors/player/player';
@@ -42,10 +50,10 @@ export class BattleScene extends Scene {
 
   onPointerup(e: PointerEvent) {
     const coords = toWorldVector(e.worldPos);
-
+    const player = e.button === 'Left' ? this.myPlayer : this.myOpponent;
     this.session.dispatch({
       type: 'test',
-      payload: { playerId: this.myPlayer.id, x: coords.x, y: coords.y }
+      payload: { playerId: player.id, x: coords.x, y: coords.y }
     });
   }
 
@@ -66,9 +74,8 @@ export class BattleScene extends Scene {
         break;
     }
 
-
     if (card === -1) return;
-    let card2play = card as HandCard;
+    const card2play = card as HandCard;
     this.session.dispatch({
       type: 'card-test',
       payload: { playerId: this.myPlayer.id, card2play }
@@ -78,6 +85,10 @@ export class BattleScene extends Scene {
   // temporary method to get the players we're controlling
   get myPlayer() {
     return this.gameState.teams[0].players.find(p => p.id === 'player1')!;
+  }
+  // temporary method to get our opponent
+  get myOpponent() {
+    return this.gameState.teams[1].players.find(p => p.id === 'player2')!;
   }
 
   private setupCamera() {

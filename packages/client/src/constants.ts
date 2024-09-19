@@ -74,15 +74,51 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
             id: 'mana1'
           },
           deck: {
-            id: "deck1",
+            id: 'deck1',
             cards: [
-              {id: "card1", cost: 1, name: "CARD 1", cooldown: 1000, targets: ["PlayerBoard"]},
-              {id: "card2", cost: 1, name: "CARD 2", cooldown: 2000, targets: ["PlayerBoard"]},
-              {id: "card3", cost: 1, name: "CARD 3", cooldown: 3000, targets: ["PlayerBoard"]},
-              {id: "card4", cost: 1, name: "CARD 4", cooldown: 4000, targets: ["PlayerBoard"]},
-              {id: "card5", cost: 1, name: "CARD 5", cooldown: 5000, targets: ["PlayerBoard"]},
-              {id: "card6", cost: 1, name: "CARD 6", cooldown: 6000, targets: ["PlayerBoard"]},
-            ],
+              {
+                id: 'card1',
+                cost: 1,
+                name: 'CARD 1',
+                cooldown: 1000,
+                targets: ['PlayerBoard']
+              },
+              {
+                id: 'card2',
+                cost: 1,
+                name: 'CARD 2',
+                cooldown: 2000,
+                targets: ['PlayerBoard']
+              },
+              {
+                id: 'card3',
+                cost: 1,
+                name: 'CARD 3',
+                cooldown: 3000,
+                targets: ['PlayerBoard']
+              },
+              {
+                id: 'card4',
+                cost: 1,
+                name: 'CARD 4',
+                cooldown: 4000,
+                targets: ['PlayerBoard']
+              },
+              {
+                id: 'card5',
+                cost: 1,
+                name: 'CARD 5',
+                cooldown: 5000,
+                targets: ['PlayerBoard']
+              },
+              {
+                id: 'card6',
+                cost: 1,
+                name: 'CARD 6',
+                cooldown: 6000,
+                targets: ['PlayerBoard']
+              }
+            ]
           }
         }
       ]
@@ -104,15 +140,51 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
             id: 'mana2'
           },
           deck: {
-            id: "deck2",
+            id: 'deck2',
             cards: [
-              {id: "card1", cost: 1, name: "CARD 1", cooldown: 1000, targets: ["PlayerBoard"]},
-              {id: "card2", cost: 1, name: "CARD 2", cooldown: 2000, targets: ["OpponentBoard"]},
-              {id: "card3", cost: 1, name: "CARD 3", cooldown: 3000, targets: ["PlayerUnit"]},
-              {id: "card4", cost: 1, name: "CARD 4", cooldown: 4000, targets: ["OpponentUnit"]},
-              {id: "card5", cost: 1, name: "CARD 5", cooldown: 5000, targets: ["PlayerTower"]},
-              {id: "card6", cost: 1, name: "CARD 6", cooldown: 6000, targets: ["OpponentTower"]},
-            ],
+              {
+                id: 'card1',
+                cost: 1,
+                name: 'CARD 1',
+                cooldown: 1000,
+                targets: ['PlayerBoard']
+              },
+              {
+                id: 'card2',
+                cost: 1,
+                name: 'CARD 2',
+                cooldown: 2000,
+                targets: ['OpponentBoard']
+              },
+              {
+                id: 'card3',
+                cost: 1,
+                name: 'CARD 3',
+                cooldown: 3000,
+                targets: ['PlayerUnit']
+              },
+              {
+                id: 'card4',
+                cost: 1,
+                name: 'CARD 4',
+                cooldown: 4000,
+                targets: ['OpponentUnit']
+              },
+              {
+                id: 'card5',
+                cost: 1,
+                name: 'CARD 5',
+                cooldown: 5000,
+                targets: ['PlayerTower']
+              },
+              {
+                id: 'card6',
+                cost: 1,
+                name: 'CARD 6',
+                cooldown: 6000,
+                targets: ['OpponentTower']
+              }
+            ]
           }
         }
       ]

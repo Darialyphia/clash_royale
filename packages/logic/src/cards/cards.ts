@@ -1,9 +1,9 @@
 import { Entity } from '../entity';
 import { type Serializable, shuffled } from '@game/shared';
-import  { TypedEventEmitter } from '../utils/typed-emitter';
-import  { type Player } from '../player/player.entity';
+import { TypedEventEmitter } from '../utils/typed-emitter';
+import { type Player } from '../player/player.entity';
 
-export type HandCard = 0 | 1 | 2 | 3
+export type HandCard = 0 | 1 | 2 | 3;
 
 export abstract class DeckSystemException extends Error {
   protected constructor(message: string) {
@@ -16,7 +16,9 @@ export class DeckTooSmallException extends DeckSystemException {
   minSize: number;
 
   constructor(minSize: number, realSize: number) {
-    super(`Expected deck with at least '${minSize}' cards but got one with '${realSize}'!`);
+    super(
+      `Expected deck with at least '${minSize}' cards but got one with '${realSize}'!`
+    );
 
     this.minSize = minSize;
     this.realSize = realSize;
@@ -24,16 +26,16 @@ export class DeckTooSmallException extends DeckSystemException {
 }
 
 export const CARD_EVENTS = {
-  DECK_BEFORE_PLAY: "DECK:BEFORE_PLAY",
-  DECK_ON_PLAY: "DECK:ON_PLAY",
-  DECK_AFTER_PLAY: "DECK:AFTER_PLAY",
+  DECK_BEFORE_PLAY: 'DECK:BEFORE_PLAY',
+  DECK_ON_PLAY: 'DECK:ON_PLAY',
+  DECK_AFTER_PLAY: 'DECK:AFTER_PLAY'
 } as const;
 
 export type CardEvent = {
   [CARD_EVENTS.DECK_BEFORE_PLAY]: [Player, Card, CardTarget];
   [CARD_EVENTS.DECK_ON_PLAY]: [Player, Card, CardTarget];
   [CARD_EVENTS.DECK_AFTER_PLAY]: [Player, Card, CardTarget];
-}
+};
 
 export type SerializedDeckSystem = {
   id: string;
@@ -41,9 +43,13 @@ export type SerializedDeckSystem = {
   drawPile: SerializedCard[];
   discardPile: SerializedCard[];
   hand: [SerializedCard, SerializedCard, SerializedCard, SerializedCard];
-}
+};
 
-export type DeckSystemSubscriber = (player: Player, card: Card, target: CardTarget) => void;
+export type DeckSystemSubscriber = (
+  player: Player,
+  card: Card,
+  target: CardTarget
+) => void;
 
 export class DeckSystem extends Entity implements Serializable<SerializedDeckSystem> {
   private _deck: Deck;
@@ -56,9 +62,10 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
    * @throws DeckTooSmallException when the deck is too small to play with
    * @param blueprint
    */
-  constructor(blueprint: { id: string, deck: Deck }) {
-    super(blueprint.id)
-    if (blueprint.deck.cards.length < 5) throw new DeckTooSmallException(5, blueprint.deck.cards.length)
+  constructor(blueprint: { id: string; deck: Deck }) {
+    super(blueprint.id);
+    if (blueprint.deck.cards.length < 5)
+      throw new DeckTooSmallException(5, blueprint.deck.cards.length);
 
     this._deck = blueprint.deck;
 
@@ -67,20 +74,25 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
 
     this.shuffleDeck();
 
-    this._hand = [this._drawPile.shift()!, this._drawPile.shift()!, this._drawPile.shift()!, this._drawPile.shift()!];
+    this._hand = [
+      this._drawPile.shift()!,
+      this._drawPile.shift()!,
+      this._drawPile.shift()!,
+      this._drawPile.shift()!
+    ];
   }
 
   /**
    * Shuffles the discard pile back into the draw pile. Does not affect the hand but does affect {@link peek}.
    */
   shuffleDeck() {
-    console.debug("Shuffling deck")
+    console.debug('Shuffling deck');
     this._drawPile = shuffled([...this._drawPile, ...this._discardPile]);
     this._discardPile = [];
   }
 
   peek(): Card {
-    return this._drawPile[0]
+    return this._drawPile[0];
   }
 
   // This can be extended with relevant properties, like coordinates etc.
@@ -94,16 +106,15 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
    * @param card
    */
   tryPlay(player: Player, target: CardTarget, card: HandCard): boolean {
-    let card2play = this._hand[card];
+    const card2play = this._hand[card];
 
     // consider returning the reason why the play failed
     if (!this.playerCanPlay(player, target, card)) return false;
-    player.manaSystem.subtract(card2play.costs())
+    player.manaSystem.subtract(card2play.costs());
     this.emitter.emit(CARD_EVENTS.DECK_BEFORE_PLAY, player, card2play, target);
 
-
     // actual effect of card is handled by some other system, the deck itself doesn't care
-    this.emitter.emit(CARD_EVENTS.DECK_ON_PLAY, player, card2play, target)
+    this.emitter.emit(CARD_EVENTS.DECK_ON_PLAY, player, card2play, target);
 
     this._hand[card] = this._drawPile.shift()!;
     this.discardPile.push(card2play);
@@ -111,7 +122,7 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
       this.shuffleDeck();
     }
 
-    for (let c of this._hand) {
+    for (const c of this._hand) {
       c.triggerCooldown();
     }
 
@@ -120,15 +131,17 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
   }
 
   playerCanPlay(player: Player, target: CardTarget, card: HandCard): boolean {
-    let card2play = this._hand[card];
+    const card2play = this._hand[card];
 
-    return card2play.targets().includes(target)
-      && (player.manaSystem.current() >= card2play.costs())
-      && card2play.cooldownProgress() === 1;
+    return (
+      card2play.targets().includes(target) &&
+      player.manaSystem.current() >= card2play.costs() &&
+      card2play.cooldownProgress() === 1
+    );
   }
 
   update(delta: number): void {
-    for (let c of this._hand) {
+    for (const c of this._hand) {
       c.update(delta);
     }
   }
@@ -155,7 +168,12 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
       deck: this.deck.serialize(),
       drawPile: this._drawPile.map(c => c.serialize()),
       discardPile: this._discardPile.map(c => c.serialize()),
-      hand: this._hand.map(c => c.serialize()) as [SerializedCard, SerializedCard, SerializedCard, SerializedCard],
+      hand: this._hand.map(c => c.serialize()) as [
+        SerializedCard,
+        SerializedCard,
+        SerializedCard,
+        SerializedCard
+      ]
     };
   }
 
@@ -172,15 +190,15 @@ export class DeckSystem extends Entity implements Serializable<SerializedDeckSys
   }
 }
 
-export type DeckBlueprint = { cards: CardBlueprint[], id: string }
+export type DeckBlueprint = { cards: CardBlueprint[]; id: string };
 
 export type SerializedDeck = {
   id: string;
   cards: SerializedCard[];
-}
+};
 
 export class Deck extends Entity implements Serializable<SerializedDeck> {
-  cards: Card[]
+  cards: Card[];
 
   constructor(blueprint: DeckBlueprint) {
     super(blueprint.id);
@@ -194,12 +212,18 @@ export class Deck extends Entity implements Serializable<SerializedDeck> {
   serialize(): SerializedDeck {
     return {
       id: this.id,
-      cards: this.cards.map(c => c.serialize()),
+      cards: this.cards.map(c => c.serialize())
     };
   }
 }
 
-export type CardTarget = "PlayerBoard" | "PlayerUnit" | "PlayerTower" | "OpponentBoard" | "OpponentUnit" | "OpponentTower";
+export type CardTarget =
+  | 'PlayerBoard'
+  | 'PlayerUnit'
+  | 'PlayerTower'
+  | 'OpponentBoard'
+  | 'OpponentUnit'
+  | 'OpponentTower';
 
 export type CardBlueprint = {
   id: string;
@@ -207,7 +231,7 @@ export type CardBlueprint = {
   name: string;
   cost: number;
   cooldown: number;
-}
+};
 
 export type SerializedCard = {
   cooldownDelay: number;
@@ -216,7 +240,7 @@ export type SerializedCard = {
   name: string;
   targets: CardTarget[];
   id: string;
-}
+};
 
 export class Card extends Entity implements Serializable<SerializedCard> {
   private cooldownDelay: number;
@@ -226,7 +250,7 @@ export class Card extends Entity implements Serializable<SerializedCard> {
   private _targets: CardTarget[];
 
   constructor(blueprint: CardBlueprint) {
-    super(blueprint.id)
+    super(blueprint.id);
     this.cooldownDelay = blueprint.cooldown;
     this.currentCooldown = 0;
     this.cost = blueprint.cost;
@@ -239,7 +263,7 @@ export class Card extends Entity implements Serializable<SerializedCard> {
    * 0 means it is cooling down, 1 means it has finished.
    */
   cooldownProgress(): number {
-    return 1 - (this.currentCooldown / this.cooldownDelay);
+    return 1 - this.currentCooldown / this.cooldownDelay;
   }
 
   triggerCooldown() {
@@ -269,7 +293,7 @@ export class Card extends Entity implements Serializable<SerializedCard> {
       currentCooldown: this.currentCooldown,
       cost: this.cost,
       name: this._name,
-      targets: this._targets,
+      targets: this._targets
     };
   }
 }

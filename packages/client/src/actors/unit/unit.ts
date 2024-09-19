@@ -55,6 +55,7 @@ export class UnitActor extends Actor {
 
   onPreUpdate(): void {
     this.z = Math.round(this.pos.y);
+    this.graphics.flipHorizontal = this.vel.x < 0;
   }
 
   onStateUpdate(newUnit: SerializedUnit) {

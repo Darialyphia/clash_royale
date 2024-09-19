@@ -1,5 +1,4 @@
-import type { Point } from '../types';
-import type { AnyObject, Entries } from '../types';
+import type { Point, AnyObject, Entries } from '../types';
 
 export const camelToSnakeCase = (str: string) =>
   str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
@@ -11,16 +10,16 @@ export const random = (max: number) => Math.random() * max;
 
 export const shuffle = <T>(array: T[]) => {
   for (let i = array.length - 1; i >= 0; i--) {
-    const j = Math.floor(random(i+1));
+    const j = Math.floor(random(i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
-}
+};
 
 export const shuffled = <T>(array: T[]): T[] => {
   array = [...array];
   shuffle(array);
   return array;
-}
+};
 
 export const randomInt = (max: number) => Math.floor(random(max + 1));
 
