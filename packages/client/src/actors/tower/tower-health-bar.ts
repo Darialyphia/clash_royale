@@ -12,11 +12,16 @@ import {
   Vector
 } from 'excalibur';
 
+const HURTBAR_MAX_WIDTH = 30;
+
 export class TowerHealthBar extends Actor {
   private readonly text: Label;
 
+  private readonly hurtBar: Actor;
+
   constructor(tower: SerializedTower) {
     super({ y: -TILE_SIZE, z: Z_INDICES.UI });
+
     this.graphics.use(
       new GraphicsGroup({
         members: [
@@ -50,10 +55,24 @@ export class TowerHealthBar extends Actor {
       })
     });
 
+    this.hurtBar = new Actor({
+      color: Color.Red,
+      x: HURTBAR_MAX_WIDTH / 2,
+      y: 0,
+      z: Z_INDICES.UI,
+      width: HURTBAR_MAX_WIDTH,
+      height: 4,
+      scale: new Vector(0, 1),
+      anchor: new Vector(1, 0.5)
+    });
+
     this.addChild(this.text);
+    this.addChild(this.hurtBar);
   }
 
   onStateUpdate(tower: SerializedTower) {
     this.text.text = `${tower.health.current.toFixed()}`;
+
+    this.hurtBar.scale.x = Math.min(1, 1 - tower.health.current / tower.health.max);
   }
 }

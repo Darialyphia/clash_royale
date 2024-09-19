@@ -12,7 +12,12 @@ import { Entity } from '../entity';
 import { config } from '../config';
 import { ManaSystem, type ManaSystemBlueprint } from '../mana/mana-system.entity';
 import { type SerializedUnit, Unit, type UnitBlueprint } from '../unit/unit.entity';
-import { Deck, type DeckBlueprint, DeckSystem, type SerializedDeckSystem } from '../cards/cards';
+import {
+  Deck,
+  type DeckBlueprint,
+  DeckSystem,
+  type SerializedDeckSystem
+} from '../cards/cards';
 import * as console from 'node:console';
 
 export type PlayerId = string;
@@ -37,7 +42,7 @@ export type SerializedPlayer = {
   maxMana: number;
   towers: SerializedTower[];
   units: SerializedUnit[];
-  deckSystem: SerializedDeckSystem
+  deckSystem: SerializedDeckSystem;
 };
 
 export class Player extends Entity implements Serializable<SerializedPlayer> {
@@ -64,7 +69,10 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       this.addOuterTower(x, y);
     });
     this.manaSystem = new ManaSystem(blueprint.manaSystem);
-    this.deckSystem = new DeckSystem({ id: `${this.id}_deck`, deck: new Deck(blueprint.deck)});
+    this.deckSystem = new DeckSystem({
+      id: `${this.id}_deck`,
+      deck: new Deck(blueprint.deck)
+    });
 
     // :(
     // this.deckSystem.subscribeBeforePlay((p, c, t) => console.log(`BEFORE: ${p.id} is playing ${c.id} at ${t}`))
@@ -97,6 +105,7 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       blueprint: {
         id: this.id + '_ti',
         attack: config.INNER_TOWER_ATTACK,
+        attackSpeed: config.INNER_TOWER_ATTACK_SPEED,
         health: config.INNER_TOWER_HEALTH,
         attackRange: config.INNER_TOWER_RANGE,
         width: config.TOWER_WIDTH,
@@ -105,6 +114,10 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       player: this
     });
     this.towers.add(tower);
+
+    tower.subscribeDestroyed(() => {
+      this.towers.delete(tower);
+    });
 
     return tower;
   }
@@ -117,12 +130,17 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
         attack: config.OUTER_TOWER_ATTACK,
         health: config.OUTER_TOWER_HEALTH,
         attackRange: config.OUTER_TOWER_RANGE,
+        attackSpeed: config.OUTER_TOWER_ATTACK_SPEED,
         width: config.TOWER_WIDTH,
         height: config.TOWER_HEIGHT
       },
       player: this
     });
     this.towers.add(tower);
+
+    tower.subscribeDestroyed(() => {
+      this.towers.delete(tower);
+    });
 
     return tower;
   }
@@ -131,16 +149,22 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
     const isWithinDeployZone = pointRectCollision(position, this.team.deployZone);
     if (!isWithinDeployZone) return;
 
-    this.units.add(
-      new Unit({
-        position: Vec2.from(position),
-        blueprint: {
-          ...blueprint,
-          id: `${this.id}_u_${++this.nextUnitId}`
-        },
-        player: this
-      })
-    );
+    const unit = new Unit({
+      position: Vec2.from(position),
+      blueprint: {
+        ...blueprint,
+        id: `${this.id}_u_${++this.nextUnitId}`
+      },
+      player: this
+    });
+
+    this.units.add(unit);
+
+    unit.subscribeDestroyed(() => {
+      this.units.delete(unit);
+    });
+
+    return unit;
   }
 
   serialize() {
@@ -150,7 +174,7 @@ export class Player extends Entity implements Serializable<SerializedPlayer> {
       maxMana: this.manaSystem.capacity(),
       towers: [...this.towers].map(tower => tower.serialize()),
       units: [...this.units].map(unit => unit.serialize()),
-      deckSystem: this.deckSystem.serialize(),
+      deckSystem: this.deckSystem.serialize()
     };
   }
 }

@@ -5,6 +5,7 @@ import { AsepriteResource } from '@excaliburjs/plugin-aseprite';
 import mapSheetPath from './assets/tilemap.png?url';
 import towerSheetPath from './assets/tower.aseprite?url';
 import towerHealthBarPath from './assets/tower_health_bar.aseprite?url';
+import unitHealthBarPath from './assets/unit_health_bar.aseprite?url';
 import heartPath from './assets/heart.aseprite?url';
 import knightPath from './assets/knight.aseprite?url';
 
@@ -12,6 +13,7 @@ export const resources = {
   mapSheet: new ImageSource(mapSheetPath),
   towerSheet: new AsepriteResource(towerSheetPath),
   towerHealthBarSheet: new AsepriteResource(towerHealthBarPath),
+  unitHealthBarSheet: new AsepriteResource(unitHealthBarPath),
   heartSheet: new AsepriteResource(heartPath),
   knightSheet: new AsepriteResource(knightPath)
 } as const;

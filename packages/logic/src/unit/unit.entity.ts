@@ -1,6 +1,8 @@
 import {
   Bbox,
   Vec2,
+  type AnyFunction,
+  type Circle,
   type Milliseconds,
   type Point,
   type Rectangle,
@@ -16,6 +18,7 @@ import { UnitSpawningState } from './states/spawning-state';
 import { UnitMovingState } from './states/moving-state';
 import { UnitAttackingState } from './states/attacking-state';
 import type { Tower } from '../tower/tower.entity';
+import { TypedEventEmitter } from '../utils/typed-emitter';
 
 /**
  * The shape of the input used to create a tower
@@ -64,6 +67,14 @@ export const UNIT_ORIENTATION = {
 } as const;
 export type UnitOrientation = Values<typeof UNIT_ORIENTATION>;
 
+const UNIT_EVENTS = {
+  DESTROY: 'UNIT:DESTROY'
+} as const;
+
+export type UnitEvent = {
+  [UNIT_EVENTS.DESTROY]: [Unit];
+};
+
 export type UnitInterceptor = Unit['interceptors'];
 
 export class Unit extends Entity implements Serializable<SerializedUnit> {
@@ -71,9 +82,14 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   private stateMachine: StateMachine<Unit, UnitState>;
 
+  private emitter = new TypedEventEmitter<UnitEvent>();
+
   readonly player: Player;
 
-  target: Unit | Tower | null = null;
+  private currentTarget: Unit | Tower | null = null;
+
+  // The target event subscruber function cleanups to runwhen the unit switches target
+  private currentTargetCleanups: AnyFunction[] = [];
 
   private health: number;
 
@@ -108,6 +124,8 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       .add(UNIT_STATES.MOVING, new UnitMovingState())
       .add(UNIT_STATES.ATTACKING, new UnitAttackingState())
       .build(this, UNIT_STATES.SPAWNING);
+
+    this.onLoseTarget = this.onLoseTarget.bind(this);
   }
 
   serialize() {
@@ -121,7 +139,7 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
       body: this._bbox.serialize(),
       velocity: this.vel.serialize(),
       orientation:
-        this.target && this.target.position().x < this.position().x
+        this.currentTarget && this.currentTarget.position().x < this.position().x
           ? UNIT_ORIENTATION.LEFT
           : UNIT_ORIENTATION.RIGHT,
       speed: this.speed()
@@ -151,8 +169,24 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     return Vec2.from(this.vel);
   }
 
-  currentTarget() {
-    return this.target;
+  target() {
+    return this.currentTarget;
+  }
+
+  private onLoseTarget() {
+    this.startMoving();
+  }
+
+  switchTarget(target: Unit | Tower | null) {
+    this.currentTargetCleanups.forEach(fn => fn());
+    this.currentTargetCleanups = [];
+
+    this.currentTarget = target;
+    if (this.currentTarget) {
+      this.currentTargetCleanups.push(
+        this.currentTarget.subscribeDestroyed(this.onLoseTarget)
+      );
+    }
   }
 
   speed() {
@@ -171,14 +205,14 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
     return this.interceptors.attackSpeed.getValue(this.blueprint.attackSpeed, this);
   }
 
-  attackRadius() {
+  attackRadius(): Circle {
     return {
       ...this.position(),
       radius: this.attackRange()
     };
   }
 
-  aggroRadius() {
+  aggroRadius(): Circle {
     return {
       ...this.position(),
       radius: this.aggroRange()
@@ -256,5 +290,21 @@ export class Unit extends Entity implements Serializable<SerializedUnit> {
 
   startAttacking() {
     this.stateMachine.setState(UNIT_STATES.ATTACKING);
+  }
+
+  dealDamage(target: Unit | Tower) {
+    target.takeDamage(this.attack());
+  }
+
+  takeDamage(amount: number) {
+    this.health = Math.max(0, this.health - amount);
+
+    if (this.health === 0) {
+      this.emitter.emit(UNIT_EVENTS.DESTROY, this);
+    }
+  }
+
+  subscribeDestroyed(cb: (unit: Unit) => void) {
+    return this.emitter.once(UNIT_EVENTS.DESTROY, cb);
   }
 }

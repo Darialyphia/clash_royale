@@ -1,8 +1,9 @@
-import { Actor, Circle, Color, Engine, Vector } from 'excalibur';
-import { DEBUG, SHOW_SPRITES, TILE_SIZE } from '@/constants';
+import { Actor, Circle, Color, Vector } from 'excalibur';
+import { DEBUG, SHOW_SPRITES } from '@/constants';
 import { GameCoords, toScreen } from '@/utils/game-coords';
 import { SerializedUnit, UNIT_ORIENTATION, UNIT_STATES, UnitState } from '@game/logic';
 import { resources } from '@/resources';
+import { UnitHealthBar } from './unit-health-bar';
 
 const unitColors: Record<UnitState, Color> = {
   [UNIT_STATES.SPAWNING]: Color.Magenta,
@@ -17,17 +18,15 @@ const unitAnimation: Record<UnitState, string> = {
 };
 
 export class UnitActor extends Actor {
-  health: number;
+  private attackRange: number;
 
-  maxHealth: number;
+  private aggroRange: number;
 
-  attackRange: number;
+  private spritesheet = resources.knightSheet;
 
-  aggroRange: number;
+  private state: UnitState;
 
-  spritesheet = resources.knightSheet;
-
-  state: UnitState;
+  private readonly healthBar: UnitHealthBar;
 
   constructor(blueprint: SerializedUnit) {
     const { x, y } = new GameCoords(blueprint.body.x, blueprint.body.y).toScreenCoords();
@@ -41,14 +40,12 @@ export class UnitActor extends Actor {
     });
 
     this.state = blueprint.state;
-    this.maxHealth = blueprint.health.max;
-    this.health = blueprint.health.current;
     this.attackRange = toScreen(blueprint.attackRange);
     this.aggroRange = toScreen(blueprint.aggroRange);
+    this.healthBar = new UnitHealthBar();
 
-    if (SHOW_SPRITES) {
-      this.graphics.use(this.spritesheet.getAnimation(unitAnimation[blueprint.state])!);
-    }
+    this.updateSprite();
+    this.addChild(this.healthBar);
 
     if (DEBUG) {
       this.debug();
@@ -60,8 +57,8 @@ export class UnitActor extends Actor {
   }
 
   onStateUpdate(newUnit: SerializedUnit) {
-    this.health = newUnit.health.current;
-    this.maxHealth = newUnit.health.max;
+    this.healthBar.onStateUpdate(newUnit);
+
     this.attackRange = toScreen(newUnit.attackRange);
     this.aggroRange = toScreen(newUnit.aggroRange);
     this.color = unitColors[newUnit.state];
@@ -72,6 +69,7 @@ export class UnitActor extends Actor {
         const graphics = this.spritesheet.getAnimation(unitAnimation[newUnit.state])!;
         this.graphics.use(graphics);
         this.state = newUnit.state;
+        this.updateSprite();
       } else {
         this.color = unitColors[newUnit.state];
       }
@@ -86,6 +84,16 @@ export class UnitActor extends Actor {
     } else {
       this.vel = vel.normalize().scale(toScreen(newUnit.speed));
     }
+  }
+
+  updateSprite() {
+    const graphics = this.spritesheet.getAnimation(unitAnimation[this.state])!;
+
+    if (SHOW_SPRITES && DEBUG) {
+      const tint = unitColors[this.state].clone().lighten(0.65);
+      graphics.tint = tint;
+    }
+    this.graphics.use(graphics);
   }
 
   debugAttackRange() {
