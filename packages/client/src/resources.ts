@@ -7,7 +7,9 @@ import towerSheetPath from './assets/tower.aseprite?url';
 import towerHealthBarPath from './assets/tower_health_bar.aseprite?url';
 import unitHealthBarPath from './assets/unit_health_bar.aseprite?url';
 import heartPath from './assets/heart.aseprite?url';
+import handPath from './assets/hand.aseprite?url';
 import knightPath from './assets/knight.aseprite?url';
+import knightCardPath from './assets/knight_card.aseprite?url';
 
 export const resources = {
   mapSheet: new ImageSource(mapSheetPath),
@@ -15,7 +17,9 @@ export const resources = {
   towerHealthBarSheet: new AsepriteResource(towerHealthBarPath),
   unitHealthBarSheet: new AsepriteResource(unitHealthBarPath),
   heartSheet: new AsepriteResource(heartPath),
-  knightSheet: new AsepriteResource(knightPath)
+  handSheet: new AsepriteResource(handPath),
+  knightSheet: new AsepriteResource(knightPath),
+  knightCardSheet: new AsepriteResource(knightCardPath)
 } as const;
 
 export const loader = new Loader();

@@ -25,3 +25,4 @@ export type {
   BoardCellBlueprint,
   SerializedBoard
 } from './board/board.entity';
+export { type SerializedCard } from './cards/cards';

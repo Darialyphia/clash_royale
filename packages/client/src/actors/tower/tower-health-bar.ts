@@ -20,7 +20,7 @@ export class TowerHealthBar extends Actor {
   private readonly hurtBar: Actor;
 
   constructor(tower: SerializedTower) {
-    super({ y: -TILE_SIZE, z: Z_INDICES.UI });
+    super({ y: -TILE_SIZE + 2, z: Z_INDICES.UI });
 
     this.graphics.use(
       new GraphicsGroup({

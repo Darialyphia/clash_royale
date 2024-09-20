@@ -7,7 +7,15 @@ import {
   KeyEvent,
   Keys
 } from 'excalibur';
-import { HEIGHT, MAP_COLS, MAP_ROWS, SESSION_BLUEPRINT, WIDTH } from '../constants';
+import {
+  HAND_HEIGHT,
+  HEIGHT,
+  MAP_COLS,
+  MAP_ROWS,
+  SESSION_BLUEPRINT,
+  TILE_SIZE,
+  WIDTH
+} from '../constants';
 import { mapSheet } from '../resources';
 import { PlayerActor } from '@/actors/player/player';
 import {
@@ -22,6 +30,7 @@ import { TowerActor } from '@/actors/tower/tower';
 import { UnitActor } from '@/actors/unit/unit';
 import { toWorldVector } from '@/utils/game-coords';
 import { HandCard } from '@game/logic/src/cards/cards.ts';
+import { HandActor } from '@/actors/hand/hand';
 
 export class BattleScene extends Scene {
   private session!: GameSession;
@@ -34,6 +43,8 @@ export class BattleScene extends Scene {
 
   private playerActorsMap = new Map<string, PlayerActor>();
 
+  private hand = new HandActor(0, HEIGHT - HAND_HEIGHT);
+
   override onInitialize(): void {
     this.session = new GameSession(SESSION_BLUEPRINT);
     this.setupCamera();
@@ -41,11 +52,13 @@ export class BattleScene extends Scene {
     this.session.subscribe(({ state }) => {
       this.gameState = state;
       this.updateActors();
+      this.hand.onStateUpdate(this.myPlayer);
     });
 
     this.input.pointers.on('up', this.onPointerup.bind(this));
     this.input.keyboard.on('press', this.onKeyPress.bind(this));
     this.session.start();
+    this.add(this.hand);
   }
 
   /**

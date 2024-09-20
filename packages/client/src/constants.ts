@@ -7,8 +7,9 @@ export const SHOW_SPRITES = true;
 export const TILE_SIZE = 32;
 export const MAP_ROWS = 7;
 export const MAP_COLS = 11;
+export const HAND_HEIGHT = 38;
 export const WIDTH = TILE_SIZE * MAP_COLS;
-export const HEIGHT = TILE_SIZE * MAP_ROWS;
+export const HEIGHT = TILE_SIZE * MAP_ROWS + HAND_HEIGHT;
 
 export const BG_COLOR = Color.fromHSL(mapRange(250, [0, 360], [0, 1]), 0.3, 0.25);
 export const TEAM_1_DEPLOY_ZONE_COLOR = Color.fromHSL(

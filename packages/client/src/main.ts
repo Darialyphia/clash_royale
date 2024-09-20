@@ -1,6 +1,6 @@
 import './style.css';
 import { BG_COLOR, HEIGHT, WIDTH } from './constants';
-import { DisplayMode, Engine, FadeInOut } from 'excalibur';
+import { Engine, FadeInOut } from 'excalibur';
 import { loader } from './resources';
 import { BattleScene } from './scenes/battle.scene';
 
