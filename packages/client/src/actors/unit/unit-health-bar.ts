@@ -28,6 +28,9 @@ export class UnitHealthBar extends Actor {
   }
 
   onStateUpdate(unit: SerializedUnit) {
-    this.hurtBar.scale.x = Math.min(1, 1 - unit.health.current / unit.health.max);
+    this.hurtBar.actions.scaleTo(
+      new Vector(Math.min(1, 1 - unit.health.current / unit.health.max), 1),
+      new Vector(2.5, 2.5)
+    );
   }
 }

@@ -73,6 +73,9 @@ export class TowerHealthBar extends Actor {
   onStateUpdate(tower: SerializedTower) {
     this.text.text = `${tower.health.current.toFixed()}`;
 
-    this.hurtBar.scale.x = Math.min(1, 1 - tower.health.current / tower.health.max);
+    this.hurtBar.actions.scaleTo(
+      new Vector(Math.min(1, 1 - tower.health.current / tower.health.max), 1),
+      new Vector(1.5, 1.5)
+    );
   }
 }

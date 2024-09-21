@@ -2,12 +2,12 @@ import { BoardCellBlueprint, GameSessionBlueprint } from '@game/logic';
 import { mapRange } from '@game/shared';
 import { Color } from 'excalibur';
 
-export const DEBUG = true;
+export const DEBUG = false;
 export const SHOW_SPRITES = true;
 export const TILE_SIZE = 32;
 export const MAP_ROWS = 7;
 export const MAP_COLS = 11;
-export const HAND_HEIGHT = 38;
+export const HAND_HEIGHT = 42;
 export const WIDTH = TILE_SIZE * MAP_COLS;
 export const HEIGHT = TILE_SIZE * MAP_ROWS + HAND_HEIGHT;
 
@@ -49,13 +49,13 @@ export const SESSION_BLUEPRINT: GameSessionBlueprint = {
     width: MAP_COLS,
     height: MAP_ROWS,
     cells: [
-      GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
-      PATH_CORNER_TL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_TR,
-      PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
-      GRASS,          GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, GRASS, 
-      PATH_V,         GRASS, GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS, PATH_V, 
-      PATH_CORNER_BL, GRASS, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, GRASS, PATH_CORNER_BR,
-      GRASS,          GRASS, GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS, GRASS,
+      GRASS,          GRASS,  GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS,  GRASS, 
+      PATH_CORNER_TL, PATH_H, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, PATH_H, PATH_CORNER_TR,
+      PATH_V,         GRASS,  GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS,  PATH_V, 
+      PATH_V,         GRASS,  GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS,  PATH_V, 
+      PATH_V,         GRASS,  GRASS,  GRASS,  GRASS,  WATER,    GRASS,  GRASS,  GRASS,  GRASS,  PATH_V, 
+      PATH_CORNER_BL, PATH_H, PATH_H, PATH_H, PATH_H, BRIDGE,   PATH_H, PATH_H, PATH_H, PATH_H,  PATH_CORNER_BR,
+      GRASS,          GRASS,  GRASS,  GRASS,  GRASS,  BRIDGE_B, GRASS,  GRASS,  GRASS,  GRASS,  GRASS,
     ]
   },
   teams: [
